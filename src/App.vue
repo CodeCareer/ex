@@ -11,4 +11,5 @@
 @import './assets/scss/animation.scss';
 @import './assets/scss/transition.scss';
 @import './assets/fonts/style.css';
+@import './assets/scss/element-ui.scss';
 </style>

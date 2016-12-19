@@ -1,0 +1,31 @@
+.el-tabs {
+  width: 100%;
+  &.el-tabs--card {
+    .el-tabs__item {
+      background: #dee2ec;
+      color: #657286;
+      height: 35px;
+      line-height: 35px;
+      border: 0;
+      border-radius: 4px 4px 0 0;
+      margin-right: 10px;
+      font-size: 15px;
+      &.is-active {
+        background: white;
+        color: #262c38;
+        border: 0;
+      }
+    }
+  }
+  .el-tabs__header {
+    margin: 0;
+    border-bottom: 0;
+    padding-left: 10px;
+  }
+}
+
+.el-tabs__content {
+  padding: 10px;
+  background: white;
+  border-radius: 4px;
+}

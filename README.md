@@ -1,6 +1,6 @@
 # kt-ex-frontend
 
-> ex
+> 交易所产品管理系统
 
 ## Build Setup
 

@@ -16,9 +16,31 @@ export default [{
     name: 'dashboard',
     component: resolve => require(['../views/ex/dashboard.vue'], resolve),
     meta: {
-      title: '开通金融-交易所产品管理系统-总览',
+      title: '开通金融-交易所产品管理系统-今日总览',
       needLogin: true
     }
+  }, {
+    path: 'products',
+    name: 'products',
+    redirect: '/ex/products/all',
+    component: resolve => require(['../views/ex/products.vue'], resolve),
+    children: [{
+      path: 'all',
+      name: 'productsAll',
+      component: resolve => require(['../views/ex/products/all.vue'], resolve),
+      meta: {
+        title: '开通金融-交易所产品管理系统-产品总列表',
+        needLogin: true
+      }
+    }, {
+      path: 'register',
+      name: 'productsRegister',
+      component: resolve => require(['../views/ex/products/register.vue'], resolve),
+      meta: {
+        title: '开通金融-交易所产品管理系统-登记产品总列表',
+        needLogin: true
+      }
+    }]
   }]
 }, {
   path: '*',

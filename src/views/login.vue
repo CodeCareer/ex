@@ -1,6 +1,6 @@
 <template lang="pug">
 .loginPage
-  .header
+  header
     .inner
       img.logo(src='../assets/images/logo.svg')
   .login-warpper(@keyup.13="submitForm()")
@@ -12,8 +12,7 @@
         el-input(placeholder="请输入您的密码",v-model="user.password",type="password")
       el-form-item
         el-button.input(type="submit",@click="submitForm") 立即登录
-  el-table(style="100%")
-  .footer
+  footer
     p(style="margin-top: 10px;") 联系电话：010-84554188   京ICP备150220058号-1
     p ©2016 开通金融信息服务（北京）有限公司
 
@@ -26,7 +25,6 @@ import {
   FormItem,
   Input,
   Button,
-  Table,
   Loading
 } from 'element-ui'
 import {
@@ -39,31 +37,35 @@ export default {
     ElFormItem: FormItem,
     ElInput: Input,
     ElButton: Button,
-    ElTable: Table,
     ElLoading: Loading
   },
   methods: {
     ...mapActions(['login']),
     submitForm() {
-      var loadingInstance
+      let loadingInstance
       this.$refs.user.validate((valid) => {
         if (valid) {
-          loadingInstance = Loading.service()
-          this.login(
-            this.user
-          ).then(res => {
-            loadingInstance.close()
-            this.$router.push({
-              name: 'dashboard'
-            })
-          }).catch(res => res.json()).then(data => {
-            loadingInstance.close()
-            MessageBox.alert(data.error || '抱歉！服务器忙。', '提示')
+          loadingInstance = Loading.service({
+            fullscreen: true
           })
+
+          this.login(
+              this.user
+            ).then(res => {
+              loadingInstance.close()
+              this.$router.push({
+                name: 'dashboard'
+              })
+            })
+            .catch(res => {
+              res.json().then(data => {
+                loadingInstance.close()
+                MessageBox.alert(data.error || '抱歉！服务器忙。', '提示')
+              })
+            })
         }
       })
     }
-
   },
 
   data() {
@@ -99,26 +101,10 @@ export default {
   width: 100%;
   height: 100vh;
   position: relative;
-  .header {
-    height: 60px;
-    width: 100%;
-    color: #ffffff;
-    background: #414453;
-    font-size: 14px;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
   .inner {
     width: 1024px;
     height: 100%;
     margin: 0 auto;
-  }
-  .logo {
-    height: 35px;
-    margin-top: 12px;
   }
   .login-warpper {
     position: absolute;
@@ -137,7 +123,6 @@ export default {
       border-radius: 4px;
       background: #ffffff;
       padding: 40px;
-
     }
     .input {
       width: 100%;
@@ -149,21 +134,6 @@ export default {
       border: none;
       text-indent: 10px;
       cursor: pointer;
-    }
-  }
-  .footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #79859a;
-    color: #ffffff;
-    padding: 30px 0;
-    margin-top: 30px;
-    p {
-      line-height: 1.3;
-      text-align: center;
-      font-size: 12px;
     }
   }
 }
