@@ -32,11 +32,11 @@ export default [
         if (request.params.noNeedLogin) {
           store.dispatch('logout', true)
         } else {
-          MessageBox.alert(res.body.errors || '无访问权限！', '提示:')
+          MessageBox.alert(res.body.error || '无访问权限！', '提示:')
           store.dispatch('logout')
         }
       } else if (res.status === 403) {
-        MessageBox.alert(res.body.errors || '您无此权限', '提示')
+        MessageBox.alert(res.body.error || '您无此权限', '提示')
       } else if (res.status === 500 || res.status === 502) { // 注释掉是为了接部分接口
         MessageBox.alert('抱歉！服务器忙。', '提示')
       } else if (res.status === 200) {

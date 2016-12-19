@@ -3,16 +3,16 @@
   .header
     .inner
       img.logo(src='../assets/images/logo.svg')
-  .login-warpper
+  .login-warpper(@keyup.13="submitForm()")
     h2 登录
-    form.login-form(@submit.prevent='submitForm()')
-      ul
-        li
-          input(v-model='user.email', type='text', placeholder='请输入您的邮箱')
-        li
-          input(v-model='user.password', type='password', placeholder='请输入您的密码')
-        li(style='margin-bottom: 30px;')
-          input(type='submit', value='立即登录')
+    el-form.login-form(ref="user",:model="user",:rules="rules",class="doem-form")
+      el-form-item(prop="email")
+        el-input(placeholder='请输入您的邮箱地址', v-model="user.email")
+      el-form-item(prop="password")
+        el-input(placeholder="请输入您的密码",v-model="user.password",type="password")
+      el-form-item
+        el-button.input(type="submit",@click="submitForm") 立即登录
+  el-table(style="100%")
   .footer
     p(style="margin-top: 10px;") 联系电话：010-84554188   京ICP备150220058号-1
     p ©2016 开通金融信息服务（北京）有限公司
@@ -21,24 +21,49 @@
 
 <script>
 import {
-  MessageBox
+  MessageBox,
+  Form,
+  FormItem,
+  Input,
+  Button,
+  Table,
+  Loading
 } from 'element-ui'
 import {
   mapActions
 } from 'vuex'
 
 export default {
+  components: {
+    ElForm: Form,
+    ElFormItem: FormItem,
+    ElInput: Input,
+    ElButton: Button,
+    ElTable: Table,
+    ElLoading: Loading
+  },
   methods: {
     ...mapActions(['login']),
     submitForm() {
-      this.login(this.user).then(() => {
-        this.$router.push({
-          name: 'dashboard'
-        })
-      }).catch(res => res.json()).then(data => {
-        MessageBox.alert(data.errors || '抱歉！服务器忙。', '提示')
+      var loadingInstance
+      this.$refs.user.validate((valid) => {
+        if (valid) {
+          loadingInstance = Loading.service()
+          this.login(
+            this.user
+          ).then(res => {
+            loadingInstance.close()
+            this.$router.push({
+              name: 'dashboard'
+            })
+          }).catch(res => res.json()).then(data => {
+            loadingInstance.close()
+            MessageBox.alert(data.error || '抱歉！服务器忙。', '提示')
+          })
+        }
       })
     }
+
   },
 
   data() {
@@ -46,6 +71,22 @@ export default {
       user: {
         email: '',
         password: ''
+      },
+      rules: {
+        email: [{
+          required: true,
+          message: '请输入邮箱地址',
+          trigger: 'blur'
+        }, {
+          type: 'email',
+          message: '请输入正确邮箱地址',
+          trigger: 'change,blur'
+        }],
+        password: [{
+          required: true,
+          message: '请输入密码',
+          trigger: 'blur'
+        }]
       }
     }
   }
@@ -96,32 +137,18 @@ export default {
       border-radius: 4px;
       background: #ffffff;
       padding: 40px;
-      li {
-        margin-top: 20px;
-        &:first-child {
-          margin-top: 0;
-        }
-      }
-      input {
-        border-radius: 4px;
-        height: 45px;
-        width: 100%;
-        background: #f3f5f8;
-        font-size: 15px;
-        text-indent: 10px;
-        // padding-left: 10px;
-        cursor: text;
-      }
-      input[type="submit"] {
-        background: #79859a;
-        color: #ffffff;
-        font-size: 17px;
-        text-indent: 0;
-        cursor: pointer;
-        &:active {
-          background: darken(#79859a, 10%);
-        }
-      }
+
+    }
+    .input {
+      width: 100%;
+      height: 40px;
+      border-radius: 4px;
+      background: #79859a;
+      font-size: 17px;
+      color: #fff;
+      border: none;
+      text-indent: 10px;
+      cursor: pointer;
     }
   }
   .footer {
