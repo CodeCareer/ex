@@ -16,10 +16,10 @@
             | 产品管理
           el-menu-item(index='1-1', :route='{name: "dashboard"}', :class='{"is-active": $route.path.startsWith("/ex/dashboard")}') 今日总览
           el-menu-item(index='1-2', :route='{name: "products"}', :class='{"is-active": $route.path.startsWith("/ex/products")}') 产品汇总
-    .body
+    .body(:style='containerStyles')
       router-view
       footer
-        p(style="margin-top: 10px;") 联系电话：010-84554188   京ICP备150220058号-1
+        p(style="margin-bottom: 10px;") 联系电话：010-84554188   京ICP备150220058号-1
         p ©2016 开通金融信息服务（北京）有限公司
 </template>
 
@@ -51,7 +51,7 @@ export default {
 
   mounted() {
     window.addEventListener('resize', e => {
-      this.containerStyles.height = `${window.innerHeight - headerH}px`
+      this.containerStyles.minHeight = `${window.innerHeight - headerH}px`
     })
   },
 
@@ -66,7 +66,7 @@ export default {
   data() {
     return {
       containerStyles: {
-        height: (window.innerHeight - headerH) + 'px'
+        minHeight: (window.innerHeight - headerH) + 'px'
       }
     }
   }
@@ -88,8 +88,9 @@ $menuHeight: 40px;
     float: right;
     height: 100%;
     line-height: $headerHeight;
-    .icon-user{
+    .icon-user {
       color: #a1aab7;
+      margin-right: 5px;
     }
     &>span {
       float: left;
@@ -115,6 +116,7 @@ $menuHeight: 40px;
     aside {
       background: #55627b;
       position: fixed;
+      z-index: 99;
       left: 0;
       width: $menuWidth;
       top: $headerHeight;
@@ -122,11 +124,13 @@ $menuHeight: 40px;
       overflow-y: auto;
     }
   }
-  .body{
-    padding: 20px;
+  .body {
+    position: relative;
+    z-index: 1;
+    padding: 20px 20px 150px;
   }
   footer {
-    left: $menuWidth;
+    // left: $menuWidth;
     width: auto;
     right: 0;
   }
@@ -141,6 +145,13 @@ $menuHeight: 40px;
       background: #79859a;
       color: white;
       font-size: 16px;
+      .icon-icomoon {
+        margin-left: -10px;
+      }
+    }
+    .icon-icomoon {
+      vertical-align: -1px;
+      margin-right: 5px;
     }
     .el-menu-item {
       color: white;

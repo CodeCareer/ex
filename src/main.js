@@ -1,10 +1,12 @@
 import router from './router'
-import setResources from './common/resources'
-import interceptors from './common/interceptors'
+import setResources from './common/resources.js'
+import interceptors from './common/interceptors.js'
+import KtFilters from './common/filters.js'
 import VueResource from 'vue-resource'
 import Vue from 'vue'
 
 Vue.use(VueResource)
+Vue.use(KtFilters)
 
 // http初始化
 Vue.http.options.root = '/internal/api/v1'

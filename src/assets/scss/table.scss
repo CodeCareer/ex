@@ -1,0 +1,43 @@
+.table {
+  border: 1px solid #e7eaf4;
+  border-radius: 0 0 4px 4px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  font-size: 13px;
+  color: #626473;
+  thead {
+    tr {
+      background: #b4becf;
+      color: white;
+    }
+    th {
+      text-align: left;
+      padding: 13px 5px;
+      &.text-center {
+        text-align: center;
+      }
+    }
+  }
+  tbody {
+    tr {
+      background: white;
+      color: #626473;
+      border-bottom: 1px solid #e5e9f3;
+      &:last-of-type {
+        border-bottom: 0;
+      }
+      &:hover {
+        background: #ecf1f7;
+      }
+    }
+    td {
+      &.text-center {
+        text-align: center;
+      }
+      padding: 8px 5px;
+    }
+  }
+}
