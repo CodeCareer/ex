@@ -1,10 +1,13 @@
 <template lang="pug">
-	.echarts
+	.echarts(ref='echart')
 </template>
 
 <script>
-import echart from 'echart/lib/echarts'
-// import tooltip from 'echart/lib/components/tooltip'
+import echart from 'echarts/lib/echarts'
+require('echarts/lib/chart/pie')
+require('echarts/lib/model/series')
+require('echarts/lib/component/tooltip')
+require('echarts/lib/component/legend')
 
 export default {
   data: function() {
@@ -14,7 +17,8 @@ export default {
   },
 
   mounted() {
-    let myChart = echart.init(document.getElementByClassName('echarts'))
+    let myChart = echart.init(this.$refs.echart)
+    console.log(myChart)
     myChart.setOption({
       tooltip: {
         trigger: 'item',
@@ -81,5 +85,10 @@ export default {
 </script>
 
 <style type="scss">
-
+	.echarts{
+		min-width:400px;
+		width:400px;
+		height:237px;
+		margin:0 auto;
+	}
 </style>
