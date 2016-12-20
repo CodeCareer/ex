@@ -7,6 +7,7 @@
         router-link(:to='{name: "productsRegister"}') 登记产品总列表
     .shared-pane
       router-view
+
 </template>
 
 <script>
@@ -36,7 +37,8 @@ export default {
     vertical-align: top;
   }
   .shared-pane {
-    border-radius: 3px;
+    margin-bottom: 40px;
+    border-radius: 4px;
     position: relative;
     z-index: 9;
     padding: 10px;

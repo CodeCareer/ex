@@ -1,0 +1,51 @@
+select {
+  border-radius: 4px;
+  width: 130px;
+  background: #ffffff;
+  height: 100%;
+  padding-left: 5px;
+  height: 25px;
+  line-height: 26px;
+  border: 0;
+  cursor: pointer;
+}
+
+// button,
+.kt-btn {
+  cursor: pointer;
+  height: 25px;
+  line-height: 25px;
+  border-radius: 4px;
+  font-size: 13px;
+  padding: 0 15px;
+  .icon-icomoon {
+    margin-right: 5px;
+    vertical-align: -1px;
+  }
+  & + .btn,
+  & + button {
+    margin-left: 10px;
+  }
+  &.kt-btn-primary {
+    $primary_color: #18b8ba;
+    background: $primary_color;
+    color: white;
+    &:hover {
+      background: lighten($primary_color, 5%);
+    }
+    &:active {
+      background: darken($primary_color, 5%);
+    }
+  }
+  &.kt-btn-gray {
+    $gray: #96a3ba;
+    background: $gray;
+    color: white;
+    &:hover {
+      background: lighten($gray, 5%);
+    }
+    &:active {
+      background: darken($gray, 5%);
+    }
+  }
+}
