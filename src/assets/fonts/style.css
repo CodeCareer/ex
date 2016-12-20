@@ -23,7 +23,18 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.icon-selectDown:before {
+  content: "\e907";
+}
+.icon-scorDown:before {
+  content: "\e908";
+}
+.icon-scorTop:before {
+  content: "\e909";
+}
+.icon-search:before {
+  content: "\e90a";
+}
 .icon-warn:before {
   content: "\e900";
 }
