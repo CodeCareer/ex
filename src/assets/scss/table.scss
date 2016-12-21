@@ -19,6 +19,38 @@ table {
       &.text-center {
         text-align: center;
       }
+      &.order-column {
+        cursor: pointer;
+        &.active {
+          &.asc {
+            .asc {
+              color: #6ae5d3;
+            }
+          }
+          &.desc {
+            .desc {
+              color: #6ae5d3;
+            }
+          }
+        }
+      }
+    }
+    .icon-order-group {
+      margin-left: 5px;
+      letter-spacing: -4px;
+      .asc,
+      .desc {
+        transform: scale(.7);
+        font-size: 12px;
+        display: inline-block;
+      }
+      .asc {
+        vertical-align: 3px;
+      }
+      .desc {
+        vertical-align: -3px;
+        transform: rotate(180deg) scale(.7);
+      }
     }
   }
   tbody {

@@ -29,3 +29,78 @@
   background: white;
   border-radius: 4px;
 }
+
+.app {
+  .el-loading-spinner .path {
+    stroke: #1bced1;
+  }
+  .el-pagination--small {
+    .btn-prev,
+    .btn-next {
+      margin: 0 2px;
+      background: none;
+      &:hover {
+        color: #68d3c3;
+      }
+    }
+    .btn-prev {
+      .el-icon-arrow-left {
+        margin-left: -2px;
+      }
+    }
+    .btn-next {
+      .el-icon-arrow-right {
+        margin-right: -2px;
+      }
+    }
+    .el-pager {
+      li {
+        margin: 0 2px;
+        padding: 0 4px 0 3px;
+        line-height: 1.8;
+        color: #c3cad2;
+        &.active {
+          color: white;
+          background-color: #96a3ba;
+          border-color: #96a3ba;
+          & + li {
+            padding-left: 4px;
+          }
+        }
+      }
+    }
+  }
+  .el-pagination__editor {
+    height: 20px;
+    &:focus {
+      border-color: #18b8ba;
+    }
+  }
+  .el-pagination {
+    display: inline-block;
+    span {
+      height: 22px;
+      line-height: 22px;
+    }
+  }
+}
+
+.el-message-box__wrapper {
+  $primary_color: #18b8ba;
+  .el-button--primary {
+    background-color: $primary_color;
+    border-color: $primary_color;
+    &:hover,
+    &:focus {
+      background-color: lighten($primary_color, 5%);
+      border-color: lighten($primary_color, 5%);
+    }
+    &:active {
+      background-color: darken($primary_color, 5%);
+      border-color: darken($primary_color, 5%);
+    }
+  }
+  .el-message-box__close:hover{
+    color: $primary_color;
+  }
+}

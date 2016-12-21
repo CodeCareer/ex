@@ -4,9 +4,9 @@
       dl(v-for='item in row')
         dt {{item.name}}
         dd(v-if='item.type === "input"')
-          input(v-model='query[item.key]')
+          input(v-model='query[item.key]', @keyup.stop.enter='search()')
         dd(v-if='item.type === "select"')
-          select(v-model='query[item.key]', :class='{"no-valid-value": query[item.key] === "null"}')
+          select(v-model='query[item.key]', :class='{"no-valid-value": query[item.key] === "null"}', @change.prevent='search()')
             option(v-for='o in item.options', :value='o.value || o.name') {{o.name}}
           i.icon-icomoon.icon-select-down
     section.buttons
@@ -14,11 +14,14 @@
         i.icon-icomoon.icon-search
         | 查询
       button.kt-btn.kt-btn-gray(@click='clear()') 清除
-    //- el-button(type='primary' icon='search', size='mini') 查询
 </template>
 
 <script>
 import _ from 'lodash'
+let defaultQuery = {
+  page: 1,
+  per_page: 15
+}
 
 export default {
   props: {
@@ -32,7 +35,7 @@ export default {
 
   methods: {
     search() {
-      let query = _.extend({}, this.query)
+      let query = _.extend({}, defaultQuery, this.query)
       _.each(query, (v, k) => {
         if (v === 'null' || _.isNil(v) || v === '') {
           delete query[k]
@@ -46,19 +49,23 @@ export default {
     },
 
     clear() {
+      // 重置select默认值
       _.each(_.flattenDeep(this.conditions), v => {
         this.query[v.key] = (v.type === 'select' ? (v.options[0].value || v.options[0].name) : null)
       })
 
       this.$router.push({
-        name: this.$route.name
+        name: this.$route.name,
+        query: defaultQuery
       })
     }
   },
 
   data() {
     let params = this.$route.query || {}
-    let query = {}
+    let query = Object.assign({}, defaultQuery)
+
+    // 初始化select类型的filter值
     _.each(_.flattenDeep(this.conditions), v => {
       query[v.key] = params[v.key] || (v.type === 'select' ? (v.options[0].value || v.options[0].name) : null)
     })

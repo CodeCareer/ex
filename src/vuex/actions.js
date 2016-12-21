@@ -17,12 +17,14 @@ export default {
   async getUser({ commit, dispatch }) {
     let data = await accounts.get().then(res => res.json())
     dispatch('updateUser', data.account)
+    return data
   },
 
   async login({ commit, dispatch }, user) {
     let data = await sessions.save({}, user).then(res => res.json())
     dispatch('updateToken', data.token)
     dispatch('getUser')
+    return data
   },
 
   logout({ commit }, silent) {

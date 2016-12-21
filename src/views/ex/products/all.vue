@@ -1,54 +1,72 @@
 <template lang="pug">
   .products-all
-    .products-all-header
-      kt-filters(:conditions="filters")
-      .table
-        table
-          thead
-            tr
-              th 产品名称
-              th 存续金额
-              th 利率
-              th 期限
-              th 到期日
-              th 产品类型
-              th 发行平台
-              th 更新状态
-              th 执行状态
-          tbody
-            tr(v-if='!products.length')
-              td.text-center(colspan='9') 没有数据！
-            tr(v-if='products.length', v-for='p in products')
-              td {{p.name}}
-              td {{p.balance | ktCurrency}}
-              td {{p.annual_rate | ktPercent}}
-              td {{p.sustained}}
-              td {{p.due_at}}
-              td {{p.open_type}}
-              td {{p.consignee}}
-              td.status-column
-                i.icon-icomoon(:class='p.update_status | updateStatusIcon')
-                span {{p.update_status}}
-              td.status-column
-                i.icon-icomoon(:class='p.execute_status| excuteStatusIcon')
-                span {{p.execute_status}}
-      .pages
-        el-pagination(small, :current-page.sync='query.page', :total="query.total_count", :page-size='query.per_page', layout='prev, pager, next, total, jumper', @current-change='pageChange')
-
-            //- router-view
+    kt-filters(:conditions='filters')
+    .table
+      table
+        thead
+          tr
+            th 产品名称
+            th.order-column(:class='[{active: query.sort_by === "balance"}, query.order]', @click='sortBy("balance")')
+              | 存续金额
+              span.icon-order-group
+                i.icon-icomoon.icon-arrow-top.asc
+                i.icon-icomoon.icon-arrow-top.desc
+            th.order-column(:class='[{active: query.sort_by === "rate"}, query.order]', @click='sortBy("rate")')
+              | 利率
+              span.icon-order-group
+                i.icon-icomoon.icon-arrow-top.asc
+                i.icon-icomoon.icon-arrow-top.desc
+            th.order-column(:class='[{active: query.sort_by === "sustained"}, query.order]', @click='sortBy("sustained")')
+              | 期限
+              span.icon-order-group
+                i.icon-icomoon.icon-arrow-top.asc
+                i.icon-icomoon.icon-arrow-top.desc
+            th.order-column(:class='[{active: query.sort_by === "expired_at"}, query.order]', @click='sortBy("expired_at")')
+              | 到期日
+              span.icon-order-group
+                i.icon-icomoon.icon-arrow-top.asc
+                i.icon-icomoon.icon-arrow-top.desc
+            th 产品类型
+            th 发行平台
+            th 更新状态
+            th.order-column(:class='[{active: query.sort_by === "execute_status"}, query.order]', @click='sortBy("execute_status")')
+              | 执行状态
+              span.icon-order-group
+                i.icon-icomoon.icon-arrow-top.asc
+                i.icon-icomoon.icon-arrow-top.desc
+        tbody
+          tr(v-if='!products.length')
+            td.text-center(colspan='9') 没有数据！
+          tr(v-if='products.length', v-for='p in products', @click='trClick(p)')
+            td
+              router-link(:to='{name: "productDashboard", params: {id: p.id}}') {{p.name}}
+            td {{p.balance | ktCurrency}}
+            td {{p.annual_rate | ktPercent}}
+            td {{p.sustained}}
+            td {{p.due_at}}
+            td {{p.open_type}}
+            td {{p.consignee}}
+            td.status-column
+              i.icon-icomoon(:class='p.update_status | updateStatusIcon')
+              span {{p.update_status}}
+            td.status-column
+              i.icon-icomoon(:class='p.execute_status| excuteStatusIcon')
+              span {{p.execute_status}}
+    .pages
+      el-pagination(small, :current-page='query.page', :total='total_count', :page-size='query.per_page', layout='prev, pager, next, total, jumper', @current-change='pageChange')
 </template>
 
 <script>
 import KtFilters from '../../../components/kt-filters.vue'
 import {
-  Table,
-  TableColumn,
-  Pagination
+  Pagination,
+  Loading
 } from 'element-ui'
 import {
   products
 } from '../../../common/resources.js'
 import _ from 'lodash'
+import ProductMixin from './mixin.js'
 
 // 更新状态icon映射
 let updateStatusIconMap = {
@@ -67,48 +85,45 @@ let excuteStatusIconMap = {
 }
 
 export default {
+  mixins: [ProductMixin],
   components: {
     KtFilters,
-    ElTable: Table,
-    ElTableColumn: TableColumn,
     ElPagination: Pagination
   },
 
-  watch: {
-    '$route' (to, from) {
-      this.getProducts(to.query)
-    }
-  },
-
-  async mounted() {
-    this.getProducts()
-  },
-
   methods: {
-    async getProducts() {
-      let resetQuery = {} // 重置所有参数
-      _.each(this.query, (v, k) => {
-        if (this.$route.query[k]) {
-          resetQuery[k] = v
+    trClick(product) {
+      this.$router.push({
+        name: 'productDashboard',
+        params: {
+          id: product.id
         }
       })
-
-      this.query = Object.assign({}, resetQuery, {
-        page: 1,
-        per_page: 15
-      }, this.$route.query)
-      let data = await products.get(this.query).then(res => res.json())
-
-      this.products = data.virtual_assets
-      this.query.total_count = data.total_count
     },
 
-    pageChange(currentPage) {
-      this.query.page = currentPage
-      this.$router.push({
-        name: this.$route.name,
-        query: this.query
+    async getProducts() {
+      let routeQuery = {} // 修理参数
+      _.each(this.$route.query, (v, k) => {
+        routeQuery[k] = _.includes(['page', 'per_page'], k) ? parseInt(v) : v
       })
+
+      this.query = Object.assign({}, {
+        page: 1,
+        per_page: 15
+      }, routeQuery)
+
+      this.instLoading = Loading.service({
+        target: '.products-all .table'
+      })
+      let data = await products.get(this.query)
+        .then(res => res.json())
+        .catch(res => {
+          this.instLoading.close()
+        })
+
+      this.products = data.virtual_assets
+      this.total_count = data.total_count
+      this.instLoading.close()
     }
   },
 
@@ -123,12 +138,6 @@ export default {
 
   data() {
     return {
-      query: {
-        page: 1,
-        per_page: 15,
-        total_count: 1
-      },
-      products: [],
       filters: [
         [{
           name: '产品名称',
@@ -212,55 +221,6 @@ export default {
     text-align: center;
     padding: 32px 0;
     margin-bottom: -90px;
-  }
-  .el-pagination--small {
-    .btn-prev,
-    .btn-next {
-      margin: 0 2px;
-      background: none;
-      &:hover {
-        color: #68d3c3;
-      }
-    }
-    .btn-prev {
-      .el-icon-arrow-left {
-        margin-left: -2px;
-      }
-    }
-    .btn-next {
-      .el-icon-arrow-right {
-        margin-right: -2px;
-      }
-    }
-    .el-pager {
-      li {
-        margin: 0 2px;
-        padding: 0 4px 0 3px;
-        line-height: 1.8;
-        color: #c3cad2;
-        &.active {
-          color: white;
-          background-color: #96a3ba;
-          border-color: #96a3ba;
-          & + li {
-            padding-left: 4px;
-          }
-        }
-      }
-    }
-  }
-  .el-pagination__editor {
-    height: 20px;
-    &:focus {
-      border-color: #18b8ba;
-    }
-  }
-  .el-pagination {
-    display: inline-block;
-    span {
-      height: 22px;
-      line-height: 22px;
-    }
   }
 }
 </style>

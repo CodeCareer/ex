@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-let sessions, accounts, products
+let sessions, accounts, products, registerProducts
 
 let previousRequestMap = {}
 let commonOpts = {
@@ -19,6 +19,7 @@ export default function setResources(resource) {
   sessions = resource('sessions', {}, {}, commonOpts) // 新闻
   accounts = resource('accounts', {}, {}, commonOpts) // 新闻
   products = resource('virtual_assets/all', {}, {}, commonOpts) // 新闻
+  registerProducts = resource('registered_products', {}, {}, commonOpts) // 新闻
 }
 
-export { sessions, accounts, products }
+export { sessions, accounts, products, registerProducts }

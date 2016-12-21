@@ -20,6 +20,14 @@ export default [{
       needLogin: true
     }
   }, {
+    path: 'dashboard/:id',
+    name: 'productDashboard',
+    component: resolve => require(['../views/ex/product_dashboard.vue'], resolve),
+    meta: {
+      title: '开通金融-交易所产品管理系统-单个产品总览',
+      needLogin: true
+    }
+  }, {
     path: 'products',
     name: 'products',
     redirect: '/ex/products/all',

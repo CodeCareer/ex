@@ -20,7 +20,7 @@
 
 <script>
 import {
-  MessageBox,
+  // MessageBox,
   Form,
   FormItem,
   Input,
@@ -36,8 +36,7 @@ export default {
     ElForm: Form,
     ElFormItem: FormItem,
     ElInput: Input,
-    ElButton: Button,
-    ElLoading: Loading
+    ElButton: Button
   },
   methods: {
     ...mapActions(['login']),
@@ -46,22 +45,18 @@ export default {
       this.$refs.user.validate((valid) => {
         if (valid) {
           loadingInstance = Loading.service({
-            fullscreen: true
+            target: '.login-form'
           })
 
-          this.login(
-              this.user
-            ).then(res => {
+          this.login(this.user)
+            .then(res => {
               loadingInstance.close()
               this.$router.push({
                 name: 'dashboard'
               })
             })
             .catch(res => {
-              res.json().then(data => {
-                loadingInstance.close()
-                MessageBox.alert(data.error || '抱歉！服务器忙。', '提示')
-              })
+              loadingInstance.close()
             })
         }
       })
