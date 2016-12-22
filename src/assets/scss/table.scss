@@ -73,3 +73,87 @@ table {
     }
   }
 }
+
+.overview-table {
+  background: #fff;
+  border-radius:4px;
+  padding:10px;
+  table {
+    margin-bottom:20px;
+    table-layout:fixed;
+    &:last-of-type{
+      margin-bottom:0;
+    }
+    thead{     
+        border-bottom:3px solid #b4becf;
+      th{
+        height:40px;
+        width:290px;
+        padding:0 0;
+        text-align: center;
+        background: #b4becf;
+        font-size:15px;
+        border-radius: 4px 4px 0 0;
+      }
+    }
+    tbody{
+      max-height:350px;
+      tr{
+        text-align: center;
+        border-bottom:1px solid #b4becf;
+        &:hover{
+          cursor: pointer;
+        }
+        &:first-of-type{
+          // border-top:3px solid #b4becf;
+          .implement{
+            line-height: 30px;
+          }
+          td{
+            height:35px;
+            line-height: 35px;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            overflow:hidden;
+            padding:0;
+            min-width:120px;
+            font-size:13px;
+            &:hover{
+              cursor:pointer;
+            }
+            &:first-of-type{
+              width:290px;
+              text-align: left;
+              text-indent:10px;
+            }
+            span{
+              cursor:pointer;
+            }
+            em{
+              margin-left:5px;
+              cursor:pointer;
+            }
+            i{
+              vertical-align: middle;
+            }
+            .em-implement{
+              vertical-align:middle;
+            }
+            .bg-color{
+              display: inline-block;
+              width:70px;
+              height:25px;
+              line-height: 25px;
+              border-radius: 4px;
+              &:hover{
+                background: #54c9b8;
+                color:#fff;
+                cursor:pointer;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

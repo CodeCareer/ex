@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-let sessions, accounts, products, registerProducts
+let sessions, accounts, products, registerProducts, subsist, stock, liquidation
 
 let previousRequestMap = {}
 let commonOpts = {
@@ -20,6 +20,9 @@ export default function setResources(resource) {
   accounts = resource('accounts', {}, {}, commonOpts) // 新闻
   products = resource('virtual_assets/all', {}, {}, commonOpts) // 新闻
   registerProducts = resource('registered_products', {}, {}, commonOpts) // 新闻
+  subsist = resource('statistics/balance', {}, {}, commonOpts) //存续金额
+  stock = resource('statistics/balance/breakdown', {}, {}, commonOpts) //产品存量占比
+  liquidation = resource('virtual_assets/settlement', {}, {}, commonOpts) //清算
 }
 
-export { sessions, accounts, products, registerProducts }
+export { sessions, accounts, registerProducts, products, subsist, stock, liquidation }

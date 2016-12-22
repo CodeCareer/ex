@@ -8,6 +8,10 @@ export default {
       return prefix + numeral(_.round(value, 2)).format('0,0.00') + suffix
     })
 
+    Vue.filter('KtOverview', (value) => {
+      return numeral(_.round(value, 2)).format('0,0.00')
+    })
+
     Vue.filter('ktPercent', (value, decimal = 2, multi = 100, unit = '%') => {
       return _.isNumber(value) ? _.round(value * multi, decimal).toFixed(decimal) + (unit || '') : ''
     })

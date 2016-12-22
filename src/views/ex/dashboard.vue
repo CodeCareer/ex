@@ -6,40 +6,221 @@
         h3 当前存续金额（元）
         .overview-left-middle
           i(class="icon-icomoon icon-overview")
-          span(text="") 2999999999
+          span {{balance.total | KtOverview}}
         .overview-left-down
           .Principal.fl
             span 存续本金
-              em(text="") 2999999
+              em {{balance.principal | KtOverview}}
           .Interest.fr
             span 存续利息
-              em(text="") 2999999
+              em {{balance.interest | KtOverview}}
       .overview-right.fr
         h3 今日存量产品占比分析
         .overview-right-middle
-          kt-echart
+          kt-pie-echart(:pie-balance="pieChart")
 
     .today-square
       h2 今日清算
-        el-tooltip(effect="dark")
+        el-tooltip(effect="dark",placement="right")
           .Prompt(slot="content") 展示今日需资金清算的所有产品，包括今日流入资金的入账确认以及今日流出资金的划款确认 <br> 待执行-清算数据正常可以进行清算执行操作确认 <br> 不可执行-清算数据尚未更新或者异常导致无法执行清算确认 <br> 已执行-已经进行过清算执行操作确认 <br> 已过期-当前时间已经晚于需确认清算执行的最晚时限
           i(class="icon-icomoon icon-explain")
+        .information.fr
+          span {{summary.executed}}
+          em 条 已执行，
+          span {{summary.pending_execute}}
+          em 条 待执行，
+          span {{summary.cant_execute}}
+          em 条 不可执行，
+          span {{summary.expired}}
+          em 条 已过期
+      .overview-table
+        table(v-for="(item,key) in virtualAssets")
+          thead
+            tr
+              th {{key}} 
+          tbody(v-for="product in item")
+            tr(@click="toDetails(product)") 
+              td
+                span {{product.name}}
+              td
+                span(v-if="product.inflow_desc") {{product.inflow_desc}}
+                  em.redColor {{product.inflow | ktCurrency}}
+              td 
+                span(v-if="product.outflow_desc") {{product.outflow_desc}}
+                  em.greenColor {{product.outflow | ktCurrency}}
+              td 
+                span {{product.inflow >= product.outflow ? '净流入' : '净流出'}}
+                  em(:class="[product.inflow >= product.outflow ? 'redColor' : 'greenColor']") {{product.net_cash_flow  | ktCurrency}}
+              td 
+                span.bg-color {{product.execute_method}}
+              td.implement 
+                i.icon-icomoon(:class="product.execute_status | excuteStatusIcon")
+                em.em-implement(:class="product.execute_status | excuteOvarviewColor") {{product.execute_status}}
+              td
+                span(v-show="product.execute_status === '待执行' ? true : false") 结算时限:
+                  em {{product.due_at}}
           
 
 </template>
 
 <script>
-import echart from '../../components/kt-overview-echart.vue'
-import {Tooltip} from 'element-ui'
+import _ from 'lodash'
+import {
+  subsist,
+  stock,
+  liquidation
+} from '../../common/resources.js'
+import KtPieEchart from '../../components/kt-pie-echart.vue'
+import {
+  Tooltip
+} from 'element-ui'
+
+// 执行状态icon映射
+let excuteStatusIconMap = {
+  '已执行': 'icon-success',
+  '待执行': 'icon-wait',
+  '不可执行': 'icon-wait',
+  '已过期': 'icon-wait'
+}
+
+//颜色状态
+let excuteColor = {
+  '已执行': 'greenColor',
+  '待执行': 'redColor',
+  '不可执行': 'grayColor',
+  '已过期': 'redColor'
+}
 export default {
   components: {
-    KtEchart: echart,
+    KtPieEchart,
     ElTooltip: Tooltip
+  },
+
+  methods: {
+    transformData(arr) {
+      return _.groupBy(arr, v => v.consignee)
+    },
+    toDetails(product) {
+      this.$router.push({
+        name: 'productDashboard',
+        params: {
+          id: product.id
+        }
+      })
+    },
+    subsistGet() {
+      subsist.get().then(res => res.json()).then(data => {
+        this.balance = data.balance
+      })
+    },
+    stockGet() {
+      stock.get().then(res => res.json()).then(data => {
+        let pieBalance = data.balance.by_consignee
+        let pieChart = {
+          legendData: [],
+          seriesData: []
+        }
+
+        for (let i = 0; i < pieBalance.length; i++) {
+          let obj = {}
+          pieChart.legendData[i] = pieBalance[i].consignee
+          obj['value'] = pieBalance[i].balance
+          obj['name'] = pieBalance[i].consignee
+          pieChart.seriesData[i] = obj
+        }
+
+        this.pieChart = pieChart
+      })
+    },
+    liquidationGet() {
+      liquidation.get().then(res => res.json()).then(data => {
+        this.summary = data.summary
+          // this.virtualAssets = data.virtual_assets
+
+        // let allname = []
+        // let newdata = []
+        // let newobj = {
+        //   consignee: null,
+        //   data: []
+        // }
+        // for (var i = 0; i < this.virtualAssets.length; i++) {
+        //   allname[i] = this.virtualAssets[i].name
+        // }
+        // let arr = [{
+        //   consignee: '恒大金服',
+        //   data: [{
+        //     'id': '58076c76641b5447fb000001',
+        //     'name': '恒存金-灵活理财',
+        //     'consignee': '恒大金服',
+        //     'inflow': 0.0,
+        //     'inflow_desc': '申购',
+        //     'outflow': 0.0,
+        //     'outflow_desc': '赎回',
+        //     'net_cash_flow': 0.0,
+        //     'execute_method': '全额结算',
+        //     'execute_status': '不可执行',
+        //     'due_at': '12:00',
+        //     'group_type': 'normal'
+        //   }]
+        // }]
+        let virtualAssets = [{
+          'id': '58076c76641b5447fb000001',
+          'name': '恒存金-灵活理财',
+          'consignee': '恒大金服',
+          'inflow': 11212,
+          'inflow_desc': '申购',
+          'outflow': 1121,
+          'outflow_desc': '赎回',
+          'net_cash_flow': 0.0,
+          'execute_method': '全额结算',
+          'execute_status': '不可执行',
+          'due_at': '12:00',
+          'group_type': 'normal'
+        }, {
+          'id': '47fb000001',
+          'name': '灵活理财',
+          'consignee': '金服',
+          'inflow': null,
+          'inflow_desc': null,
+          'outflow': 22220,
+          'outflow_desc': '赎',
+          'net_cash_flow': 0,
+          'execute_method': '结算',
+          'execute_status': '已执行',
+          'due_at': '2:00',
+          'group_type': 'normal'
+        }]
+        this.virtualAssets = this.transformData(virtualAssets) //data.virtual_assets
+        console.log(this.virtualAssets)
+      })
+    }
+  },
+  filters: {
+    excuteStatusIcon(value) {
+      return excuteStatusIconMap[value] || ''
+    },
+    excuteOvarviewColor(value) {
+      return excuteColor[value]
+    }
+  },
+  mounted() {
+    this.subsistGet()
+    this.stockGet()
+    this.liquidationGet()
+  },
+
+  data() {
+    return {
+      balance: '',
+      pieChart: null,
+      summary: '',
+      virtualAssets: ''
+    }
   }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scope>
 .fl {
   float: left;
 }
@@ -53,18 +234,17 @@ export default {
   h2 {
     margin-bottom: 10px;
     font-size: 17px;
-    font-weight: bold;
   }
 }
 
 .today-overview {
-  overflow:hidden;
+  overflow: hidden;
   .overview-left,
   .overview-right {
     border-radius: 4px;
     background: #fff;
     padding: 10px;
-    width: 47.5%;
+    width: 49.5%;
   }
   .overview-left {
     h3 {
@@ -155,14 +335,44 @@ export default {
     }
   }
 }
-.today-square{
-  margin-top:25px;
-  h2{
-    i{
-      font-size:15px;
-      color:#b4becf;
-      margin-left:5px;
+
+.today-square {
+  margin-top: 25px;
+  h2 {
+    i {
+      font-size: 15px;
+      color: #b4becf;
+      margin-left: 5px;
+    }
+    .information {
+      font-size: 13px;
+      span {
+        color: #54c9b8;
+      }
+      em {
+        font-style: normal;
+      }
     }
   }
+}
+
+.redColor {
+  color: #e6695e;
+}
+
+.greenColor {
+  color: #54c9b8;
+}
+
+.garyColor {
+  color: #c3cad2;
+}
+
+.redColor {
+  color: red;
+}
+
+.overview-table {
+  max-height: 500px;
 }
 </style>
