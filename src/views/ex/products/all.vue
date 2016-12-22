@@ -66,26 +66,11 @@ import {
   products
 } from '../../../common/resources.js'
 import _ from 'lodash'
-import ProductMixin from './mixin.js'
-
-// 更新状态icon映射
-let updateStatusIconMap = {
-  '已更新': 'icon-success',
-  '更新中': 'icon-wait',
-  '待更新': 'icon-wait',
-  '异常': 'icon-wait'
-}
-
-// 执行状态icon映射
-let excuteStatusIconMap = {
-  '已执行': 'icon-success',
-  '待执行': 'icon-wait',
-  '不可执行': 'icon-wait',
-  '已过期': 'icon-wait'
-}
+import productMixin from './mixin.js'
+import exMixin from '../mixin.js'
 
 export default {
-  mixins: [ProductMixin],
+  mixins: [exMixin, productMixin],
   components: {
     KtFilters,
     ElPagination: Pagination
@@ -124,15 +109,6 @@ export default {
       this.products = data.virtual_assets
       this.total_count = data.total_count
       this.instLoading.close()
-    }
-  },
-
-  filters: {
-    updateStatusIcon(value) {
-      return updateStatusIconMap[value] || ''
-    },
-    excuteStatusIcon(value) {
-      return excuteStatusIconMap[value] || ''
     }
   },
 
@@ -202,21 +178,6 @@ export default {
 
 <style lang="scss">
 .products-all {
-  .status-column {
-    .icon-icomoon {
-      color: #c8cfd6;
-      margin-right: 5px;
-    }
-    .icon-wait + span {
-      color: #eb7c72;
-    }
-    .icon-success {
-      font-size: 12px;
-      &+ span {
-        color: #46b1a0;
-      }
-    }
-  }
   .pages {
     text-align: center;
     padding: 32px 0;

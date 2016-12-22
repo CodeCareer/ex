@@ -37,29 +37,29 @@
         table(v-for="(item,key) in virtualAssets")
           thead
             tr
-              th {{key}} 
+              th {{key}}
           tbody(v-for="product in item")
-            tr(@click="toDetails(product)") 
+            tr(@click="toDetails(product)")
               td
                 span {{product.name}}
               td
                 span(v-if="product.inflow_desc") {{product.inflow_desc}}
-                  em.redColor {{product.inflow | ktCurrency}}
-              td 
+                  em.red-color {{product.inflow | ktCurrency}}
+              td
                 span(v-if="product.outflow_desc") {{product.outflow_desc}}
-                  em.greenColor {{product.outflow | ktCurrency}}
-              td 
+                  em.green-color {{product.outflow | ktCurrency}}
+              td
                 span {{product.inflow >= product.outflow ? '净流入' : '净流出'}}
-                  em(:class="[product.inflow >= product.outflow ? 'redColor' : 'greenColor']") {{product.net_cash_flow  | ktCurrency}}
-              td 
+                  em(:class="[product.inflow >= product.outflow ? 'red-color' : 'green-color']") {{product.net_cash_flow  | ktCurrency}}
+              td
                 span.bg-color {{product.execute_method}}
-              td.implement 
+              td.implement.status-column
                 i.icon-icomoon(:class="product.execute_status | excuteStatusIcon")
-                em.em-implement(:class="product.execute_status | excuteOvarviewColor") {{product.execute_status}}
+                em.em-implement {{product.execute_status}}
               td
                 span(v-show="product.execute_status === '待执行' ? true : false") 结算时限:
                   em {{product.due_at}}
-          
+
 
 </template>
 
@@ -74,23 +74,10 @@ import KtPieEchart from '../../components/kt-pie-echart.vue'
 import {
   Tooltip
 } from 'element-ui'
+import exMixin from './mixin.js'
 
-// 执行状态icon映射
-let excuteStatusIconMap = {
-  '已执行': 'icon-success',
-  '待执行': 'icon-wait',
-  '不可执行': 'icon-wait',
-  '已过期': 'icon-wait'
-}
-
-//颜色状态
-let excuteColor = {
-  '已执行': 'greenColor',
-  '待执行': 'redColor',
-  '不可执行': 'grayColor',
-  '已过期': 'redColor'
-}
 export default {
+  mixins: [exMixin],
   components: {
     KtPieEchart,
     ElTooltip: Tooltip
@@ -195,14 +182,7 @@ export default {
       })
     }
   },
-  filters: {
-    excuteStatusIcon(value) {
-      return excuteStatusIconMap[value] || ''
-    },
-    excuteOvarviewColor(value) {
-      return excuteColor[value]
-    }
-  },
+
   mounted() {
     this.subsistGet()
     this.stockGet()
@@ -354,22 +334,6 @@ export default {
       }
     }
   }
-}
-
-.redColor {
-  color: #e6695e;
-}
-
-.greenColor {
-  color: #54c9b8;
-}
-
-.garyColor {
-  color: #c3cad2;
-}
-
-.redColor {
-  color: red;
 }
 
 .overview-table {

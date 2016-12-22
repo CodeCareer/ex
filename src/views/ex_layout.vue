@@ -171,5 +171,37 @@ $menuHeight: 40px;
       border-radius: 0;
     }
   }
+  .red-color {
+    color: #e6695e;
+  }
+  .green-color {
+    color: #54c9b8;
+  }
+  .gray-color {
+    color: #c3cad2;
+  }
+  .status-column {
+    .icon-icomoon {
+      color: #c8cfd6;
+      margin-right: 5px;
+    }
+    .icon-wait {
+      & + span,
+      & + em {
+        @extend .red-color;
+      }
+      &.ignore-status + span,
+      &.ignore-status + em {
+        @extend .gray-color;
+      }
+    }
+    .icon-success {
+      font-size: 12px;
+      & + span,
+      & + em {
+        @extend .green-color;
+      }
+    }
+  }
 }
 </style>

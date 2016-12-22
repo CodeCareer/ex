@@ -4,14 +4,15 @@ import mutations from './mutations'
 import getters from './getters'
 import actions from './actions'
 
-const debug = process.env.NODE_ENV !== 'production'
+// const debug = process.env.NODE_ENV !== 'production'
 const state = {
   user: JSON.parse(window.localStorage.user || '{}'),
   token: window.localStorage.token
 }
 
 Vue.use(Vuex)
-Vue.config.debug = debug
+
+// Vue.config.debug = debug
 
 const store = new Vuex.Store({
   state,
