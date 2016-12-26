@@ -31,7 +31,6 @@ export default {
         show: true,
         trigger: 'item',
         formatter: (params, ticket, callback) => {
-          debugger
           return '<div style="text-align:center; font-size:14px;">' + params.name + params.name + '<br/>' + Vue.filter('ktCurrency')(params.value) + '(' + params.percent + '%)' + '</div>'
         }
       },

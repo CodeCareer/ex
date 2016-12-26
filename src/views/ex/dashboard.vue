@@ -122,63 +122,34 @@ export default {
     liquidationGet() {
       liquidation.get().then(res => res.json()).then(data => {
         this.summary = data.summary
-          // this.virtualAssets = data.virtual_assets
-
-        // let allname = []
-        // let newdata = []
-        // let newobj = {
-        //   consignee: null,
-        //   data: []
-        // }
-        // for (var i = 0; i < this.virtualAssets.length; i++) {
-        //   allname[i] = this.virtualAssets[i].name
-        // }
-        // let arr = [{
-        //   consignee: '恒大金服',
-        //   data: [{
-        //     'id': '58076c76641b5447fb000001',
-        //     'name': '恒存金-灵活理财',
-        //     'consignee': '恒大金服',
-        //     'inflow': 0.0,
-        //     'inflow_desc': '申购',
-        //     'outflow': 0.0,
-        //     'outflow_desc': '赎回',
-        //     'net_cash_flow': 0.0,
-        //     'execute_method': '全额结算',
-        //     'execute_status': '不可执行',
-        //     'due_at': '12:00',
-        //     'group_type': 'normal'
-        //   }]
+        // let virtualAssets = [{
+        //   'id': '58076c76641b5447fb000001',
+        //   'name': '恒存金-灵活理财',
+        //   'consignee': '恒大金服',
+        //   'inflow': 11212,
+        //   'inflow_desc': '申购',
+        //   'outflow': 1121,
+        //   'outflow_desc': '赎回',
+        //   'net_cash_flow': 0.0,
+        //   'execute_method': '全额结算',
+        //   'execute_status': '不可执行',
+        //   'due_at': '12:00',
+        //   'group_type': 'normal'
+        // }, {
+        //   'id': '47fb000001',
+        //   'name': '灵活理财',
+        //   'consignee': '金服',
+        //   'inflow': null,
+        //   'inflow_desc': null,
+        //   'outflow': 22220,
+        //   'outflow_desc': '赎',
+        //   'net_cash_flow': 0,
+        //   'execute_method': '结算',
+        //   'execute_status': '已执行',
+        //   'due_at': '2:00',
+        //   'group_type': 'normal'
         // }]
-        let virtualAssets = [{
-          'id': '58076c76641b5447fb000001',
-          'name': '恒存金-灵活理财',
-          'consignee': '恒大金服',
-          'inflow': 11212,
-          'inflow_desc': '申购',
-          'outflow': 1121,
-          'outflow_desc': '赎回',
-          'net_cash_flow': 0.0,
-          'execute_method': '全额结算',
-          'execute_status': '不可执行',
-          'due_at': '12:00',
-          'group_type': 'normal'
-        }, {
-          'id': '47fb000001',
-          'name': '灵活理财',
-          'consignee': '金服',
-          'inflow': null,
-          'inflow_desc': null,
-          'outflow': 22220,
-          'outflow_desc': '赎',
-          'net_cash_flow': 0,
-          'execute_method': '结算',
-          'execute_status': '已执行',
-          'due_at': '2:00',
-          'group_type': 'normal'
-        }]
-        this.virtualAssets = this.transformData(virtualAssets) //data.virtual_assets
-        console.log(this.virtualAssets)
+        this.virtualAssets = this.transformData(data.virtual_assets) //data.virtual_assets
       })
     }
   },
@@ -249,7 +220,7 @@ export default {
       span {
         position: relative;
         font-size: 35px;
-        color: #95dbcf;
+        color: #66cebe;
         margin-left: 35px;
         margin-top: 3px;
         vertical-align: middle;
@@ -273,7 +244,7 @@ export default {
         }
         em {
           font-style: normal;
-          color: #95dbcf;
+          color: #66cebe;
           margin-left: 8px;
           &:before {
             content: "￥";
@@ -289,7 +260,7 @@ export default {
         }
         em {
           font-style: normal;
-          color: #95dbcf;
+          color: #66cebe;
           margin-left: 8px;
           &:before {
             content: "￥";
@@ -338,5 +309,6 @@ export default {
 
 .overview-table {
   max-height: 500px;
+  overflow-y:scroll;
 }
 </style>

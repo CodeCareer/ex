@@ -84,7 +84,7 @@ table {
     &:last-of-type{
       margin-bottom:0;
     }
-    thead{     
+    thead{
         border-bottom:3px solid #b4becf;
       th{
         height:40px;
@@ -98,14 +98,14 @@ table {
     }
     tbody{
       max-height:350px;
+      overflow-y:scroll;
       tr{
-        text-align: center;
+        text-align: left;
         border-bottom:1px solid #b4becf;
         &:hover{
           cursor: pointer;
         }
         &:first-of-type{
-          // border-top:3px solid #b4becf;
           .implement{
             line-height: 30px;
           }
@@ -145,6 +145,7 @@ table {
               height:25px;
               line-height: 25px;
               border-radius: 4px;
+              text-align: center;
               &:hover{
                 background: #54c9b8;
                 color:#fff;
@@ -152,6 +153,33 @@ table {
               }
             }
           }
+        }
+      }
+    }
+  }
+}
+
+.product-table{
+  background: #ecf1f7;
+  border-radius: 4px;
+  padding:10px;
+  margin-top:10px;
+  table{
+    table-layout:fixed;
+    tr{
+    background: #ecf1f7;
+    &:hover{
+      cursor:crosshair;
+    }
+    }
+    td{
+      height:60px;
+      line-height: 50px;
+      padding:0;
+      span{
+        font-size:13px;
+        em{
+          margin-left:5px;
         }
       }
     }
