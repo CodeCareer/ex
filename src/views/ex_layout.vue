@@ -9,13 +9,13 @@
       span.log-out(@click='logout()') 退出
   section.container(:style='containerStyles')
     aside(style='')
-      el-menu(:unique-opened='true', :router='true', :default-openeds='["1"]')
+      el-menu(:unique-opened='true', :router='true', :default-openeds='["1"]', ref='menus')
         el-submenu(index='1')
           template(slot='title')
             i.icon-icomoon.icon-list
             | 产品管理
-          el-menu-item(index='1-1', :route='{name: "dashboard"}', :class='{"is-active": $route.path.startsWith("/ex/dashboard")}') 今日总览
-          el-menu-item(index='1-2', :route='{name: "products"}', :class='{"is-active": $route.path.startsWith("/ex/products")}') 产品汇总
+          el-menu-item(index='1-1', :route='{name: "dashboard"}', :class='{"is-active": $route.path.startsWith(menuActiveStatusMap.dashboard)}') 今日总览
+          el-menu-item(index='1-2', :route='{name: "products"}', :class='{"is-active": $route.path.startsWith(menuActiveStatusMap.products)}') 产品汇总
     .body(:style='containerStyles')
       router-view
       footer
@@ -36,6 +36,7 @@ import {
   mapGetters,
   mapActions
 } from 'vuex'
+import _ from 'lodash'
 
 let headerH = 60 // header高度
 
@@ -49,6 +50,14 @@ export default {
     ElMenuItemGroup: MenuItemGroup
   },
 
+  watch: {
+    '$route' (to, from) {
+      setTimeout(() => {
+        this.amendMenuActiveStatus(this.$refs.menus)
+      }, 100)
+    }
+  },
+
   mounted() {
     window.addEventListener('resize', e => {
       this.containerStyles.minHeight = `${window.innerHeight - headerH}px`
@@ -56,6 +65,18 @@ export default {
   },
 
   methods: {
+    // 修正menu的激活状态
+    amendMenuActiveStatus(menus) {
+      _.each(menus.$children, (v) => {
+        if (v.route) {
+          v.$el.classList.toggle('is-active', this.$route.path.startsWith(this.menuActiveStatusMap[v.route.name]))
+        }
+
+        if (v.$children.length) {
+          this.amendMenuActiveStatus(v)
+        }
+      })
+    },
     ...mapActions(['logout'])
   },
 
@@ -65,6 +86,10 @@ export default {
 
   data() {
     return {
+      menuActiveStatusMap: {
+        dashboard: '/ex/dashboard',
+        products: '/ex/products'
+      },
       containerStyles: {
         minHeight: (window.innerHeight - headerH) + 'px'
       }

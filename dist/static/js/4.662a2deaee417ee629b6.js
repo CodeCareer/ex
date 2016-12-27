@@ -1,2 +1,0 @@
-webpackJsonp([4,6],{192:function(e,t,n){var r,o,c=n(198);o=r=r||{},"object"!=typeof r.default&&"function"!=typeof r.default||(o=r=r.default),"function"==typeof o&&(o=o.options),o.render=c.render,o.staticRenderFns=c.staticRenderFns,e.exports=r},198:function(e,t){e.exports={render:function(){var e=this,t=(e.$createElement,e._c);return t("div",[e._v("register")])},staticRenderFns:[]}}});
-//# sourceMappingURL=4.662a2deaee417ee629b6.js.map

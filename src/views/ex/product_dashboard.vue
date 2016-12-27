@@ -215,15 +215,15 @@ export default {
     ElTooltip: Tooltip
   },
   methods: {
-    essentialInformationGet() {  //产品基本信息
-      essentialInformation.get({
+    essentialInformationGet() { //产品基本信息
+      return essentialInformation.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.virtualAsset = data.virtual_asset
       })
     },
-    productLiquidationGet() {  //近期清算
-      productLiquidation.get({
+    productLiquidationGet() { //近期清算
+      return productLiquidation.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.settlement = data
@@ -232,8 +232,8 @@ export default {
         this.todayQserror = false
       })
     },
-    updateGet() {   //今日更新
-      update.get({
+    updateGet() { //今日更新
+      return update.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.updated = data
@@ -242,15 +242,15 @@ export default {
         this.todayUpdateerror = false
       })
     },
-    productExecutePost() {  //产品执行post
+    productExecutePost() { //产品执行post
       return productExecute.save({
         virtual_asset_id: this.$route.params.id
       }, {}).then(res => res.json()).then(data => {
         this.settlement.execute_status = data.execute_status
       })
     },
-    productStockGet() {  //单个产品的存量图表
-      productStock.get({
+    productStockGet() { //单个产品的存量图表
+      return productStock.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.stockChartOption = _.merge({}, this.stockChartOption, {
@@ -288,27 +288,32 @@ export default {
       })
     },
 
-    registeredProductsGet() {  //单个产品下的存量登记产品列表
+    registeredProductsGet() { //单个产品下的存量登记产品列表
       let loadingInstance = Loading.service({
-        target: '.table-two'
+        target: '.stock-all-right'
       })
-      registeredProducts.get({
+
+      return registeredProducts.get({
         virtual_asset_id: this.$route.params.id,
         ...this.registeredProductPages
       }).then(res => res.json()).then(data => {
         this.registeredProducts = this.registeredProducts.concat(data.registered_products)
         loadingInstance.close()
+      }).catch(() => {
+        loadingInstance.close()
       })
     },
-    //下拉刷新数据
-    dropDown() {
+
+    //存量产品登记详情滚动事件初始化
+    scrollInit() {
       let dropdown = this.$refs.dropDown
       let registeredProductPagesObj = this.registeredProductPages
-      dropdown.addEventListener('scroll', () => {
+      dropdown.addEventListener('scroll', (ev) => {
         if (dropdown.scrollTop + dropdown.clientHeight === dropdown.scrollHeight) {
           registeredProductPagesObj.page += 1
           this.registeredProductsGet()
         }
+        ev.stopPropagation()
       })
     },
 
@@ -354,6 +359,7 @@ export default {
     let productLoading = Loading.service({
       target: '.content'
     })
+
     Promise.all([
       this.essentialInformationGet(),
       this.productLiquidationGet(),
@@ -367,7 +373,8 @@ export default {
     }).catch(() => {
       productLoading.close()
     })
-    this.dropDown()
+
+    this.scrollInit()
   },
 
   filters: {
@@ -383,8 +390,8 @@ export default {
       settlement: '',
       todayQs: '',
       todayUpdate: '',
-      todayQserror: null,
-      todayUpdateerror: null,
+      todayQserror: true,
+      todayUpdateerror: true,
       stockChartOption: {},
       registeredProducts: [],
       registeredProductPages: {

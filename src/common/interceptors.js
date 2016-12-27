@@ -5,6 +5,10 @@ import store from '../vuex/store.js'
 
 const CACHE_URLS = []
 
+let alertOpt = {
+  type: 'error'
+}
+
 export default [
   function(request, next) {
     let key = Vue.url(request.url, request.params)
@@ -32,15 +36,15 @@ export default [
         if (request.params.noNeedLogin) {
           store.dispatch('logout', true)
         } else {
-          MessageBox.alert(res.body.error || '无访问权限！', '提示:')
+          MessageBox.alert(res.body.error || res.body.errors || '无访问权限！', '提示', alertOpt)
           store.dispatch('logout')
         }
       } else if (res.status === 400) {
-        MessageBox.alert(res.body.error || '访问姿势不正确')
+        MessageBox.alert(res.body.error || res.body.errors || '请求失败！', '提示', alertOpt)
       } else if (res.status === 403) {
-        MessageBox.alert(res.body.error || '您无此权限', '提示')
+        MessageBox.alert(res.body.error || res.body.errors || '您无此权限', '提示', alertOpt)
       } else if (res.status === 500 || res.status === 502) { // 注释掉是为了接部分接口
-        MessageBox.alert('抱歉！服务器忙。', '提示')
+        MessageBox.alert('抱歉！服务器忙。', '提示', alertOpt)
       } else if (res.status === 200) {
         if (request.cache) {
           let key = Vue.url(request.url, request.params)
