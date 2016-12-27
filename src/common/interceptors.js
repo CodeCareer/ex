@@ -35,6 +35,8 @@ export default [
           MessageBox.alert(res.body.error || '无访问权限！', '提示:')
           store.dispatch('logout')
         }
+      } else if (res.status === 400) {
+        MessageBox.alert(res.body.error || '访问姿势不正确')
       } else if (res.status === 403) {
         MessageBox.alert(res.body.error || '您无此权限', '提示')
       } else if (res.status === 500 || res.status === 502) { // 注释掉是为了接部分接口
