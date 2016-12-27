@@ -57,7 +57,7 @@
                 el-tooltip(effect="dark",placement="top")
                   .Prompt(slot="content") 已更新-本期更新数据已经传输和处理完毕 <br> 待更新-本期应该有更新数据但尚未开始传输 <br> 更新中-本期更新数据正在传输或处理中 <br> 异常-当前时间已经晚于数据更新的最晚截止时间但仍未传输或处理完毕
                   i(class="icon-icomoon icon-explain")
-              span.update-time 更新时间
+              span.update-time(v-if="updated.update_status == '待更新'?false:true") 更新时间
                 em {{updated.updated_at}}
           .product-table
             table
@@ -83,7 +83,7 @@
               el-tooltip(effect="dark",placement="top")
                 .Prompt(slot="content") 待执行-清算数据正常可以进行清算执行操作确认<br> 不可执行-清算数据尚未更新或者异常导致无法执行清算确认 <br> 已执行-已经进行过清算执行操作确认 <br> 已过期-当前时间已经晚于需确认清算执行的最晚时限
                 i(class="icon-icomoon icon-explain")
-            span.update-time 更新时间
+            span.update-time(v-if="settlement.execute_status === '待执行'?true:false") 更新时间
               em {{settlement.execute_at}}
 
         .detailed-middle
@@ -97,7 +97,7 @@
             li
               span 开户行:
               em {{virtualAsset.consignee_bank_name}}
-          .sure(:class="[settlement.execute_status === '不可执行'?'disable':'']") 确认执行
+          .sure(:class="[settlement.execute_status === '待执行' ? '' : 'disabled']", @click.prevent="submit") 确认执行
     .stock
       h2 存量情况
       .stock-all
@@ -125,69 +125,72 @@
         ul
           li
             span 产品全称：
-            em {{virtualAsset.name |changeDate}}
+            em {{virtualAsset.name |ktChangeDate}}
           li
             span 产品简称：
-            em {{virtualAsset.product_short_name |changeDate}}
+            em {{virtualAsset.product_short_name |ktChangeDate}}
           li
             span 收益率：
-            em {{virtualAsset.annual_rate |changeDate}}
+            em {{virtualAsset.annual_rate |ktChangeDate}}
           li
             span 募集总规模（元）：
-            em {{virtualAsset.allocated_amount |ktCurrency |changeDate}}
+            em {{virtualAsset.allocated_amount |ktCurrency |ktChangeDate}}
           li
             span 待发行金额（元）：
-            em {{virtualAsset.unissued_amount |ktCurrency |changeDate}}
+            em {{virtualAsset.unissued_amount |ktCurrency |ktChangeDate}}
           li
             span 兑付总额：
-            em {{virtualAsset.cash_amount |ktCurrency |changeDate}}
+            em {{virtualAsset.cash_amount |ktCurrency |ktChangeDate}}
           li
             span 起购金额（元）：
-            em {{virtualAsset.min_subscription_amount |ktCurrency|changeDate}}
+            em {{virtualAsset.min_subscription_amount |ktCurrency|ktChangeDate}}
           li
             span 递增金额（元）：
-            em {{virtualAsset.increase_amount |ktCurrency|changeDate}}
+            em {{virtualAsset.increase_amount |ktCurrency|ktChangeDate}}
           li
             span 产品投向（范围）：
-            em {{virtualAsset.orientated_to |changeDate}}
+            em {{virtualAsset.orientated_to |ktChangeDate}}
           li
             span 产品风险等级：
-            em {{virtualAsset.risk_level |changeDate}}
+            em {{virtualAsset.risk_level |ktChangeDate}}
       .essential-information-right.fr.essential-information-all
         h3 关键日期和期限
         ul
           li
             span 上架时间 ：
-            em {{virtualAsset.published_start_at |changeDate}}
+            em {{virtualAsset.published_start_at |ktChangeDate}}
           li
             span 下架时间 ：
-            em {{virtualAsset.published_end_at | changeDate}}
+            em {{virtualAsset.published_end_at | ktChangeDate}}
           li
             span 募集期（天）：
-            em {{virtualAsset.reserved_sustained |changeDate}}
+            em {{virtualAsset.reserved_sustained |ktChangeDate}}
           li
             span 起息日：
-            em {{virtualAsset.value_at | changeDate}}
+            em {{virtualAsset.value_at | ktChangeDate}}
           li
             span 到期日：
-            em {{virtualAsset.due_at | changeDate}}
+            em {{virtualAsset.due_at | ktChangeDate}}
           li
             span 还款日：
-            em {{virtualAsset.repayment_at | changeDate}}
+            em {{virtualAsset.repayment_at | ktChangeDate}}
           li
             span 期限：
-            em {{virtualAsset.sustained |changeDate}}
+            em {{virtualAsset.sustained |ktChangeDate}}
           li
             span 开放间隔期（天）：
-            em {{virtualAsset.open_cycle |changeDate}}
+            em {{virtualAsset.open_cycle |ktChangeDate}}
           li
             span 开放日：
-            em {{virtualAsset.open_at |changeDate}}
+            em {{virtualAsset.open_at |ktChangeDate}}
 </template>
 
 <script>
 import exMixin from './mixin.js'
 import {
+  MessageBox,
+  Message,
+  Loading,
   Tooltip
 } from 'element-ui'
 import ktBarChart from '../../components/kt-bar-echart.vue'
@@ -211,35 +214,35 @@ export default {
     ElTooltip: Tooltip
   },
   methods: {
-    essentialInformationGet() {
+    essentialInformationGet() {  //产品基本信息
       essentialInformation.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.virtualAsset = data.virtual_asset
       })
     },
-    productLiquidationGet() {
+    productLiquidationGet() {  //近期清算
       productLiquidation.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.settlement = data
       })
     },
-    updateGet() {
+    updateGet() {   //今日更新
       update.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.updated = data
       })
     },
-    productExecuteGet() {
-      productExecute.save({
+    productExecutePost() {  //产品执行post
+      return productExecute.save({
         virtual_asset_id: this.$route.params.id
       }, {}).then(res => res.json()).then(data => {
-
+        this.settlement.execute_status = data.execute_status
       })
     },
-    productStockGet() {
+    productStockGet() {  //单个产品的存量图表
       productStock.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
@@ -278,52 +281,90 @@ export default {
       })
     },
 
-    registeredProductsGet() {
+    registeredProductsGet() {  //单个产品下的存量登记产品列表
+      let loadingInstance = Loading.service({
+        target: '.table-two'
+      })
       registeredProducts.get({
         virtual_asset_id: this.$route.params.id,
         ...this.registeredProductPages
       }).then(res => res.json()).then(data => {
         this.registeredProducts = this.registeredProducts.concat(data.registered_products)
+        loadingInstance.close()
       })
     },
-
+    //下拉刷新数据
     dropDown() {
       let dropdown = this.$refs.dropDown
       let registeredProductPagesObj = this.registeredProductPages
       dropdown.addEventListener('scroll', () => {
         if (dropdown.scrollTop + dropdown.clientHeight === dropdown.scrollHeight) {
-          debugger
-          console.log(this.registeredProductPages)
           registeredProductPagesObj.page += 1
           this.registeredProductsGet()
         }
       })
-    }
+    },
 
+    //点击执行提交
+    submit() {
+      if (this.settlement.execute_status !== '待执行') return
+
+      MessageBox({
+        title: '提示',
+        message: '您确定要执行吗',
+        showCancelButton: true,
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      }).then(action => {
+        if (action === 'confirm') {
+          this.productExecutePost().then(() => {
+            Message({
+              type: 'success',
+              message: '执行成功'
+            })
+          })
+        } else {
+          Message({
+            type: 'info',
+            message: '取消执行'
+          })
+        }
+      })
+    }
+    //单个登记产品下的客户 暂时预留
     // investorGet() {
     //   investor.get({}).then(res => res.json()).then(data => {
 
     //   })
     // },
+    //单个产品的费用详情 暂时预留
     // feesGet() {
     //   fees.get({}).then(res => res.json()).then(data => {})
     // }
   },
 
   mounted() {
-    this.essentialInformationGet()
-    this.productLiquidationGet()
-    this.updateGet()
-      // this.productExecuteGet()
-    this.productStockGet()
-    this.registeredProductsGet()
+    let productLoading = Loading.service({
+      target: '.content'
+    })
+    Promise.all([
+      this.essentialInformationGet(),
+      this.productLiquidationGet(),
+      this.updateGet(),
+      this.productStockGet(),
+      this.registeredProductsGet()
       // this.investorGet()
       // this.feesGet()
+    ]).then(() => {
+      productLoading.close()
+    }).catch(() => {
+      productLoading.close()
+    })
     this.dropDown()
   },
 
   filters: {
-    changeDate(value) {
+    ktChangeDate(value) {
       return value || '—'
     }
   },
@@ -575,6 +616,15 @@ export default {
       font-size: 15px;
       text-align: center;
       cursor: pointer;
+      &.disabled {
+        color: #8e98a9;
+        cursor: not-allowed;
+        // pointer-events: none;
+      }
+      // . {
+      //   color: #49b0a1;
+      //   cursor: pointer;
+      // }
     }
   }
 }
@@ -692,10 +742,5 @@ export default {
       }
     }
   }
-}
-
-.disable {
-  color: #8e98a9;
-  cursor: inherit;
 }
 </style>
