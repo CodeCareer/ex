@@ -1,35 +1,35 @@
 <template lang="pug">
   .content
-    .h1 甜穗宝1号理财计划D056
+    .h1 {{virtualAsset.name}}
     .today-overview
       h2 今日总览
       .overview-left.fl
         h3 当前存续金额（元）
         .overview-left-middle
           i(class="icon-icomoon icon-overview")
-          span {{23333333 | KtOverview}}
+          span {{virtualAsset.balance | KtOverview}}
         .overview-left-down
           .Principal.fl
             span 存续本金
-              em.em-money {{4534534534 | KtOverview}}
+              em.em-money {{virtualAsset.balance_principal | KtOverview}}
           .Interest.fr
             span 存续利息
-              em.em-money {{232322332 | KtOverview}}
+              em.em-money {{virtualAsset.balance_interest | KtOverview}}
       .overview-right.fr
         h3 已清算金额（元）
         .product-right-middle
           .overview-rm-top
-            span {{232323 | ktOverview}}
+            span {{virtualAsset.settlement | ktOverview}}
           .overview-rm-down
             .overivew-rmd-principal.fl
               span 已清算本金
-                em.em-money {{2323232 | ktOverview}}
+                em.em-money {{virtualAsset.settlement_principal | ktOverview}}
             .overview-rmd-interest.fr
               span 已清算利息
-                em.em-money {{322323 | ktOverview}}
+                em.em-money {{virtualAsset.settlement_interest | ktOverview}}
         h3 累积募集金额（元）
         .overview-right-down
-          span {{12121212 | ktOverview}}
+          span {{virtualAsset.subscription_amount | ktOverview}}
     .today-detailed
       h2 今日明细
       .today-detailed-left.fl
@@ -40,69 +40,69 @@
               tbody
                 tr
                   td
-                    span 发行
-                      em {{23232323 |ktCurrency}}
+                    span(v-if="settlement.total_inflow_desc") {{settlement.total_inflow_desc}}
+                      em.red-color {{settlement.total_inflow | ktCurrency}}
                   td
-                    span
-                      em
+                    span(v-if="settlement.total_outflow_desc") {{settlement.total_outflow_desc}}
+                      em.green-color {{settlement.total_outflow | ktCurrency}}
                   td
-                    span 净流入
-                      em {{1212100 | ktCurrency}}
+                    span {{updated.total_inflow >= updated.total_outflow?'净流入':'净流出'}}
+                      em(class="[updated.total_inflow >= updated.total_outflow?'red-color':'green-color']") {{settlement.total_net_cash_flow | ktCurrency}}
         .today-update
           h3 今日更新
             .update-data.fr
               span.update-status
-                i(class="icon-icomoon icon-wait")
-                em 已更新
+                i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
+                em {{updated.update_status}}
                 el-tooltip(effect="dark",placement="top")
                   .Prompt(slot="content") 已更新-本期更新数据已经传输和处理完毕 <br> 待更新-本期应该有更新数据但尚未开始传输 <br> 更新中-本期更新数据正在传输或处理中 <br> 异常-当前时间已经晚于数据更新的最晚截止时间但仍未传输或处理完毕
                   i(class="icon-icomoon icon-explain")
               span.update-time 更新时间
-                em 9:00
+                em {{updated.updated_at}}
           .product-table
             table
               tbody
                 tr
                   td
-                    span 发行
-                      em {{232323434 | ktCurrency}}
+                    span {{updated.total_inflow_desc}}
+                      em.red-color {{updated.total_inflow | ktCurrency}}
                   td
-                    span
-                      em
+                    span {{updated.total_outflow_desc}}
+                      em.green-color {{updated.total_outflow | ktCurrency}}
                   td
-                    span 净流入
-                      em {{345345345 | ktCurrency}}
+                    span {{updated.total_inflow >= updated.total_outflow?'净流入':'净流出'}}
+                      em {{updated.total_net_cash_flow | ktCurrency}}
 
       .today-detailed-right.fr
         .detailed-top
           .detailed-top-left.fl 全额结算
           .update-data.fr
             span.update-status
-              i(class="icon-icomoon icon-wait")
-              em 已更新
+              i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
+              em {{settlement.execute_status}}
               el-tooltip(effect="dark",placement="top")
                 .Prompt(slot="content") 待执行-清算数据正常可以进行清算执行操作确认<br> 不可执行-清算数据尚未更新或者异常导致无法执行清算确认 <br> 已执行-已经进行过清算执行操作确认 <br> 已过期-当前时间已经晚于需确认清算执行的最晚时限
                 i(class="icon-icomoon icon-explain")
             span.update-time 更新时间
-              em 9:00
+              em {{settlement.execute_at}}
 
         .detailed-middle
           ul
             li
               span 用户名:
-              em 32323fsvd
+              em {{virtualAsset.consignee_bank_account_name}}
             li
               span 账 &nbsp &nbsp户:
-              em 23232323sdfs
+              em {{virtualAsset.consignee_bank_account}}
             li
               span 开户行:
-              em 2232323sf
-          .sure 确认执行
+              em {{virtualAsset.consignee_bank_name}}
+          .sure(:class="[settlement.execute_status === '不可执行'?'disable':'']") 确认执行
     .stock
       h2 存量情况
       .stock-all
         .stock-all-left.fl
-          bar-chart
+          bar-chart(:bar-echarts="stock")
         .stock-all-right.fr
           h3 存量登记产品详情
           .table-one
@@ -112,194 +112,220 @@
                   td 产品代码
                   td 规模
                   td 客户数量
-          .table-two
+          .table-two(ref="dropDown")
             table
               tbody
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
-                tr
-                  td ydsf2323
-                  td {{234243 | ktCurrency}}
-                  td 123
+                tr(v-for="registeredProduct in registeredProducts")
+                  td {{registeredProduct.product_code}}
+                  td {{registeredProduct.balance | ktCurrency}}
+                  td {{registeredProduct.investor_count}}
     .essential-information
       .essential-information-left.fl.essential-information-all
         h3 基本信息
         ul
           li
             span 产品全称：
-            em 甜穗宝1号理财计划B020
+            em {{virtualAsset.name |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 产品简称：
+            em {{virtualAsset.product_short_name |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 收益率：
+            em {{virtualAsset.annual_rate |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 募集总规模（元）：
+            em {{virtualAsset.allocated_amount |ktCurrency |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 待发行金额（元）：
+            em {{virtualAsset.unissued_amount |ktCurrency |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 兑付总额：
+            em {{virtualAsset.cash_amount |ktCurrency |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 起购金额（元）：
+            em {{virtualAsset.min_subscription_amount |ktCurrency|changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 递增金额（元）：
+            em {{virtualAsset.increase_amount |ktCurrency|changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 产品投向（范围）：
+            em {{virtualAsset.orientated_to |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 产品风险等级：
+            em {{virtualAsset.risk_level |changeDate}}
       .essential-information-right.fr.essential-information-all
         h3 关键日期和期限
         ul
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 上架时间 ：
+            em {{virtualAsset.published_start_at |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 下架时间 ：
+            em {{virtualAsset.published_end_at | changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 募集期（天）：
+            em {{virtualAsset.reserved_sustained |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 起息日：
+            em {{virtualAsset.value_at | changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 到期日：
+            em {{virtualAsset.due_at | changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 还款日：
+            em {{virtualAsset.repayment_at | changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 期限：
+            em {{virtualAsset.sustained |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 开放间隔期（天）：
+            em {{virtualAsset.open_cycle |changeDate}}
           li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
-          li
-            span 产品全称：
-            em 甜穗宝1号理财计划B020
+            span 开放日：
+            em {{virtualAsset.open_at |changeDate}}
 </template>
 <script>
+import exMixin from './mixin.js'
 import {
   Tooltip
 } from 'element-ui'
 import barChart from '../../components/kt-bar-echart.vue'
+import {
+  essentialInformation,
+  productLiquidation,
+  update,
+  productExecute,
+  productStock,
+  registeredProducts
+  // investor,
+  // fees
+} from '../../common/resources.js'
+
 export default {
+  mixins: [exMixin],
   components: {
     barChart,
     ElTooltip: Tooltip
   },
-  directives: {
-    // scroll: {
-    //   bind: function(el, binding) {
-    //     el.on('scroll', () => {
-    //       if (el.scrollTop() >= el[0].scrollHeight - el.height()) {
-    //         let newhtml = '<tr>' + '<td>田丽媛</td>' + '<td>323232323</td>' + '<td>323</td></tr>'
-    //         el.children().append(newhtml)
-    //       }
-    //     })
-    //   }
+  // directives: {
+  //   scroll: {
+  //     bind: function(el, binding) {
+  //       debugger
+  //       console.log(binding.expression)
+  //       el.addEventListener('scroll', () => {
+  //         debugger
+  //         if (el.scrollTop + el.clientHeight === el.scrollHeight) {
+  //           debugger
+  //           binding.expression.page += 1
+  //           this.registeredProductsGet()
+  //         }
+  //       })
+  //     }
+  //   }
+  // },
+  methods: {
+    essentialInformationGet() {
+      essentialInformation.get({
+        virtual_asset_id: this.$route.params.id
+      }).then(res => res.json()).then(data => {
+        this.virtualAsset = data.virtual_asset
+      })
+    },
+    productLiquidationGet() {
+      productLiquidation.get({
+        virtual_asset_id: this.$route.params.id
+      }).then(res => res.json()).then(data => {
+        this.settlement = data
+      })
+    },
+    updateGet() {
+      update.get({
+        virtual_asset_id: this.$route.params.id
+      }).then(res => res.json()).then(data => {
+        this.updated = data
+      })
+    },
+    productExecuteGet() {
+      productExecute.save({
+        virtual_asset_id: this.$route.params.id
+      }, {}).then(res => res.json()).then(data => {
+
+      })
+    },
+    productStockGet() {
+      productStock.get({
+        virtual_asset_id: this.$route.params.id
+      }).then(res => res.json()).then(data => {
+        // let stockObj = {
+        //   dateArr: [],
+        //   principalArr: [],
+        //   interestArr: []
+        // }
+        // for (let i = 0; i < data.balance_trends.length; i++) {
+        //   stockObj.dateArr[i] = data.balance_trends[i].date
+        //   stockObj.principalArr[i] = data.balance_trends[i].principal
+        //   stockObj.interestArr[i] = data.balance_trends[i].interest
+        // }
+        // this.stock = stockObj
+      })
+    },
+    registeredProductsGet() {
+      registeredProducts.get({
+        virtual_asset_id: this.$route.params.id,
+        ...this.registeredProductPages
+      }).then(res => res.json()).then(data => {
+        this.registeredProducts = this.registeredProducts.concat(data.registered_products)
+      })
+    },
+    dropDown() {
+      let dropdown = this.$refs.dropDown
+      let registeredProductPagesObj = this.registeredProductPages
+      dropdown.addEventListener('scroll', () => {
+        if (dropdown.scrollTop + dropdown.clientHeight === dropdown.scrollHeight) {
+          debugger
+          console.log(this.registeredProductPages)
+          registeredProductPagesObj.page += 1
+          this.registeredProductsGet()
+        }
+      })
+    }
+    // investorGet() {
+    //   investor.get({}).then(res => res.json()).then(data => {
+
+    //   })
+    // },
+    // feesGet() {
+    //   fees.get({}).then(res => res.json()).then(data => {})
     // }
+  },
+  mounted() {
+    this.essentialInformationGet()
+    this.productLiquidationGet()
+    this.updateGet()
+      // this.productExecuteGet()
+    this.productStockGet()
+    this.registeredProductsGet()
+      // this.investorGet()
+      // this.feesGet()
+    this.dropDown()
+  },
+  filters: {
+    changeDate(value) {
+      return value || '—'
+    }
+  },
+  data() {
+    return {
+      virtualAsset: '',
+      updated: '',
+      settlement: '',
+      stock: '',
+      registeredProducts: [],
+      registeredProductPages: {
+        page: 1,
+        per_page: 10
+      }
+    }
   }
 }
 </script>
@@ -606,17 +632,17 @@ export default {
     }
   }
 }
-.essential-information{
-  margin-top:10px;
-  overflow:hidden;
 
-  .essential-information-all{
+.essential-information {
+  margin-top: 10px;
+  overflow: hidden;
+  .essential-information-all {
     background: #fff;
-    border-radius:4px;
-    padding:10px;
-    width:49.5%;
-    height:432px;
-    h3{
+    border-radius: 4px;
+    padding: 10px;
+    width: 49.5%;
+    height: 432px;
+    h3 {
       height: 40px;
       width: 100%;
       line-height: 40px;
@@ -625,30 +651,34 @@ export default {
       text-align: center;
       border-radius: 4px 4px 0 0;
     }
-    ul{
-      width:100%;
-      li{
-        height:38px;
+    ul {
+      width: 100%;
+      li {
+        height: 38px;
         line-height: 38px;
-        border-top:1px solid #e5e9f3;
-        &:nth-of-type(1){
-          border:none;
+        border-top: 1px solid #e5e9f3;
+        &:nth-of-type(1) {
+          border: none;
         }
-        span{
+        span {
           display: inline-block;
-          margin-right:3%;
-          color:#8e98a9;
-          width:47%;
+          margin-right: 3%;
+          color: #8e98a9;
+          width: 47%;
           text-align: right;
         }
-        em{
-          width:47%;
+        em {
+          width: 47%;
           display: inline-block;
-          font-style:normal;
-          color:#616a7b;
+          font-style: normal;
+          color: #616a7b;
         }
       }
     }
   }
+}
+.disable{
+  color: #8e98a9;
+  cursor: inherit;
 }
 </style>

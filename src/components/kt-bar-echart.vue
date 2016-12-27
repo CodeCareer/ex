@@ -1,6 +1,7 @@
 <template lang="pug">
   .bar-echart(ref="chart")
 </template>
+
 <script>
 import echarts from 'echarts/lib/echarts'
 require('echarts/lib/chart/bar')
@@ -10,6 +11,8 @@ require('echarts/lib/component/tooltip')
 require('echarts/lib/component/legend')
 require('echarts/lib/component/grid')
 require('echarts/lib/component/axis')
+import _ from 'lodash'
+
 export default {
   components: {
     echarts
@@ -19,6 +22,7 @@ export default {
       barChart: null
     }
   },
+  props: ['chartOption'],
   mounted() {
     this.barChart = echarts.init(this.$refs.chart)
     var option = {
@@ -53,7 +57,7 @@ export default {
       },
       xAxis: [{
         type: 'category',
-        data: ['3.12', '3.13', '3.14', '3.15', '3.16', '3.17', '3.18', '3.19', '3.20', '3.21']
+        data: [2323]//this.barChart.dateArr
       }],
       yAxis: [{
         type: 'value'
@@ -62,19 +66,26 @@ export default {
         name: '存续本金',
         type: 'bar',
         stack: '广告',
-        data: [10, 13002, 10100, 13400, 9000, 23000, 21000, 20030, 20010]
+        data: [2323]//this.barChart.principalArr
       }, {
         name: '存续利息',
         type: 'bar',
         stack: '广告',
-        data: [2200, 1200, 1091, 2034, 2900, 3300, 3000, 2000, 2100]
+        data: [2232]//this.barChart.interestArr
       }],
       color: ['#35cec3', '#b4becf']
     }
-    this.barChart.setOption(option)
+    this.barChart.setOption(_.extend({}, option, this.chartOption))
+  },
+
+  watch: {
+    chartOption() {
+      this.barChart.setOption(this.chartOption)
+    }
   }
 }
 </script>
+
 <style lang="scss">
 .bar-echart {
   min-width: 500px;
