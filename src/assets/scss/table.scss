@@ -76,80 +76,80 @@ table {
 
 .overview-table {
   background: #fff;
-  border-radius:4px;
-  padding:10px;
+  border-radius: 4px;
+  padding: 10px;
   table {
-    margin-bottom:20px;
-    table-layout:fixed;
-    &:last-of-type{
-      margin-bottom:0;
+    margin-bottom: 20px;
+    table-layout: fixed;
+    &:last-of-type {
+      margin-bottom: 0;
     }
-    thead{
-        border-bottom:3px solid #b4becf;
-      th{
-        height:40px;
-        width:290px;
-        padding:0 0;
+    thead {
+      border-bottom: 3px solid #b4becf;
+      th {
+        height: 40px;
+        width: 290px;
+        padding: 0 0;
         text-align: center;
         background: #b4becf;
-        font-size:15px;
+        font-size: 15px;
         border-radius: 4px 4px 0 0;
       }
     }
-    tbody{
-      max-height:350px;
-      overflow-y:scroll;
-      tr{
+    tbody {
+      max-height: 350px;
+      overflow-y: scroll;
+      tr {
         text-align: left;
-        border-bottom:1px solid #b4becf;
-        &:hover{
+        border-bottom: 1px solid #b4becf;
+        &:hover {
           cursor: pointer;
         }
-        &:first-of-type{
-          .implement{
+        &:first-of-type {
+          .implement {
             line-height: 30px;
           }
-          td{
-            height:35px;
+          td {
+            height: 35px;
             line-height: 35px;
-            text-overflow:ellipsis;
-            white-space:nowrap;
-            overflow:hidden;
-            padding:0;
-            min-width:120px;
-            font-size:13px;
-            &:hover{
-              cursor:pointer;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            padding: 0;
+            min-width: 120px;
+            font-size: 13px;
+            &:hover {
+              cursor: pointer;
             }
-            &:first-of-type{
-              width:290px;
+            &:first-of-type {
+              width: 290px;
               text-align: left;
-              text-indent:10px;
+              text-indent: 10px;
             }
-            span{
-              cursor:pointer;
+            span {
+              cursor: pointer;
             }
-            em{
-              margin-left:5px;
-              cursor:pointer;
+            em {
+              margin-left: 5px;
+              cursor: pointer;
             }
-            i{
+            i {
               vertical-align: middle;
             }
-            .em-implement{
-              vertical-align:middle;
+            .em-implement {
+              vertical-align: middle;
             }
-            .bg-color{
+            .bg-color {
               display: inline-block;
-              width:70px;
-              height:25px;
+              width: 70px;
+              height: 25px;
               line-height: 25px;
               border-radius: 4px;
               text-align: center;
-              &:hover{
+              &:hover {
                 background: #54c9b8;
-                color:#fff;
-                cursor:pointer;
+                color: #fff;
+                cursor: pointer;
               }
             }
           }
@@ -159,27 +159,37 @@ table {
   }
 }
 
-.product-table{
+.update-square {
   background: #ecf1f7;
   border-radius: 4px;
-  padding:10px;
-  margin-top:10px;
-  table{
-    table-layout:fixed;
-    tr{
-    background: #ecf1f7;
-    &:hover{
-      cursor:crosshair;
+  // padding:10px;
+  margin-top: 10px;
+  height: 80px;
+  line-height: 80px;
+  text-align: center;
+}
+
+.product-table {
+  background: #ecf1f7;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 10px;
+  table {
+    table-layout: fixed;
+    tr {
+      background: #ecf1f7;
+      &:hover {
+        cursor: crosshair;
+      }
     }
-    }
-    td{
-      height:60px;
+    td {
+      height: 60px;
       line-height: 50px;
-      padding:0;
-      span{
-        font-size:13px;
-        em{
-          margin-left:5px;
+      padding: 0;
+      span {
+        font-size: 13px;
+        em {
+          margin-left: 5px;
         }
       }
     }

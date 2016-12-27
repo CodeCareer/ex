@@ -35,7 +35,7 @@
       .today-detailed-left.fl
         .ex-product-table
           h3 今日清算
-          .product-table
+          .product-table(v-if="todayQserror")
             table
               tbody
                 tr
@@ -48,9 +48,10 @@
                   td
                     span {{updated.total_inflow >= updated.total_outflow?'净流入':'净流出'}}
                       em(class="[updated.total_inflow >= updated.total_outflow?'red-color':'green-color']") {{settlement.total_net_cash_flow | ktCurrency}}
+          .update-square(v-if="!todayQserror") {{todayQs}}
         .today-update
           h3 今日更新
-            .update-data.fr
+            .update-data.fr(v-if="todayUpdateerror")
               span.update-status
                 i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
                 em {{updated.update_status}}
@@ -59,7 +60,7 @@
                   i(class="icon-icomoon icon-explain")
               span.update-time(v-if="updated.update_status == '待更新'?false:true") 更新时间
                 em {{updated.updated_at}}
-          .product-table
+          .product-table(v-if="todayUpdateerror")
             table
               tbody
                 tr
@@ -72,11 +73,11 @@
                   td
                     span {{updated.total_inflow >= updated.total_outflow?'净流入':'净流出'}}
                       em {{updated.total_net_cash_flow | ktCurrency}}
-
+          .update-square(v-if="!todayUpdateerror") {{todayUpdate}}
       .today-detailed-right.fr
         .detailed-top
           .detailed-top-left.fl 全额结算
-          .update-data.fr
+          .update-data.fr(v-if="todayQserror")
             span.update-status
               i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
               em {{settlement.execute_status}}
@@ -226,6 +227,9 @@ export default {
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.settlement = data
+      }).catch(data => {
+        this.todayQs = data.body.errors
+        this.todayQserror = false
       })
     },
     updateGet() {   //今日更新
@@ -233,6 +237,9 @@ export default {
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.updated = data
+      }).catch(data => {
+        this.todayUpdate = data.body.errors
+        this.todayUpdateerror = false
       })
     },
     productExecutePost() {  //产品执行post
@@ -374,6 +381,10 @@ export default {
       virtualAsset: '',
       updated: '',
       settlement: '',
+      todayQs: '',
+      todayUpdate: '',
+      todayQserror: null,
+      todayUpdateerror: null,
       stockChartOption: {},
       registeredProducts: [],
       registeredProductPages: {
