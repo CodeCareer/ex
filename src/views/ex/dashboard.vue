@@ -6,18 +6,18 @@
         h3 当前存续金额（元）
         .overview-left-middle
           i(class="icon-icomoon icon-overview")
-          span {{balance.total | KtOverview}}
+          span {{balance.total | ktCurrency('')}}
         .overview-left-down
           .Principal.fl
             span 存续本金
-              em {{balance.principal | KtOverview}}
+              em {{balance.principal | ktCurrency('')}}
           .Interest.fr
             span 存续利息
-              em {{balance.interest | KtOverview}}
+              em {{balance.interest | ktCurrency('')}}
       .overview-right.fr
         h3 今日存量产品占比分析
         .overview-right-middle
-          kt-pie-echart(:pie-balance="pieChart")
+          kt-pie-echart(:chart-option="pieChartOption")
 
     .today-square
       h2 今日清算
@@ -59,8 +59,6 @@
               td
                 span(v-show="product.execute_status === '待执行' ? true : false") 结算时限:
                   em {{product.due_at}}
-
-
 </template>
 
 <script>
@@ -72,11 +70,10 @@ import {
 } from '../../common/resources.js'
 import KtPieEchart from '../../components/kt-pie-echart.vue'
 import {
-  Tooltip
-  // Loading
+  Tooltip,
+  Loading
 } from 'element-ui'
 import exMixin from './mixin.js'
-// let gitone, gittwo, gitthree
 export default {
   mixins: [exMixin],
   components: {
@@ -85,9 +82,8 @@ export default {
   },
 
   methods: {
-    transformData(arr) {
-      return _.groupBy(arr, v => v.consignee)
-    },
+
+    // 查看单个产品详情总览
     toDetails(product) {
       this.$router.push({
         name: 'productDashboard',
@@ -97,87 +93,85 @@ export default {
         }
       })
     },
-    subsistGet() {
-      subsist.get().then(res => res.json()).then(data => {
-        this.balance = data.balance
-        // gitone = true
-      })
-    },
-    stockGet() {
-      stock.get().then(res => res.json()).then(data => {
-        let pieBalance = data.balance.by_consignee
-        let pieChart = {
-          legendData: [],
-          seriesData: []
-        }
 
-        for (let i = 0; i < pieBalance.length; i++) {
-          let obj = {}
-          pieChart.legendData[i] = pieBalance[i].consignee
-          obj['value'] = pieBalance[i].balance
-          obj['name'] = pieBalance[i].consignee
-          pieChart.seriesData[i] = obj
-        }
-        this.pieChart = pieChart
-        // gittwo = true
+    // 当前存续金额（元）
+    subsistGet() {
+      return subsist.get().then(res => res.json()).then(data => {
+        this.balance = data.balance
       })
     },
+
+    // 今日存量产品占比分析
+    stockGet() {
+      return stock.get().then(res => res.json()).then(data => {
+        this.pieChartOption = _.merge({}, this.pieChartOption, {
+          legend: {
+            data: _.map(data.balance.by_consignee, 'consignee')
+          },
+          series: [{
+            name: '',
+            type: 'pie',
+            center: ['70%', '50%'],
+            radius: ['50%', '80%'],
+            avoidLabelOverlap: false,
+            label: {
+              normal: {
+                show: false,
+                position: 'center'
+              },
+              emphasis: {
+                show: true,
+                textStyle: {
+                  fontSize: '25',
+                  fontWeight: 'bold'
+                }
+              }
+            },
+            labelLine: {
+              normal: {
+                show: false
+              }
+            },
+            data: _.map(data.balance.by_consignee, v => {
+              return {
+                name: v.consignee,
+                value: v.balance
+              }
+            })
+          }]
+        })
+      })
+    },
+
+    // 今日清算
     liquidationGet() {
-      liquidation.get().then(res => res.json()).then(data => {
+      return liquidation.get().then(res => res.json()).then(data => {
         this.summary = data.summary
-        // gitthree = true
-          // let virtualAssets = [{
-          //   'id': '58076c76641b5447fb000001',
-          //   'name': '恒存金-灵活理财',
-          //   'consignee': '恒大金服',
-          //   'inflow': 11212,
-          //   'inflow_desc': '申购',
-          //   'outflow': 1121,
-          //   'outflow_desc': '赎回',
-          //   'net_cash_flow': 0.0,
-          //   'execute_method': '全额结算',
-          //   'execute_status': '不可执行',
-          //   'due_at': '12:00',
-          //   'group_type': 'normal'
-          // }, {
-          //   'id': '47fb000001',
-          //   'name': '灵活理财',
-          //   'consignee': '金服',
-          //   'inflow': null,
-          //   'inflow_desc': null,
-          //   'outflow': 22220,
-          //   'outflow_desc': '赎',
-          //   'net_cash_flow': 0,
-          //   'execute_method': '结算',
-          //   'execute_status': '已执行',
-          //   'due_at': '2:00',
-          //   'group_type': 'normal'
-          // }]
-        this.virtualAssets = this.transformData(data.virtual_assets) //data.virtual_assets
+        this.virtualAssets = _.groupBy(data.virtual_assets, v => v.consignee)
       })
     }
-    // isloading() {
-    //   let loadingInstance = Loading.service({
-    //     fullscreen: true
-    //   })
-    //   debugger
-    //   if (gitone && gittwo && gitthree) {
-    //     loadingInstance.close()
-    //   }
-    // }
   },
 
   mounted() {
-    this.subsistGet()
-    this.stockGet()
-    this.liquidationGet()
-    // this.isloading()
+    this.instLoading = Loading.service({
+      target: '.overview'
+    })
+
+    Promise.all([
+      this.subsistGet(),
+      this.stockGet(),
+      this.liquidationGet()
+    ]).then(() => {
+      this.instLoading.close()
+    }).catch(res => {
+      this.instLoading.close()
+    })
   },
 
   data() {
     return {
       balance: '',
-      pieChart: null,
+      pieChartOption: {},
       summary: '',
       virtualAssets: ''
     }

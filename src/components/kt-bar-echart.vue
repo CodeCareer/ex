@@ -5,7 +5,6 @@
 <script>
 import echarts from 'echarts/lib/echarts'
 require('echarts/lib/chart/bar')
-  // require('echarts/')
 require('echarts/lib/model/series')
 require('echarts/lib/component/tooltip')
 require('echarts/lib/component/legend')
@@ -14,15 +13,13 @@ require('echarts/lib/component/axis')
 import _ from 'lodash'
 
 export default {
-  components: {
-    echarts
-  },
+  props: ['chartOption'],
   data() {
     return {
       barChart: null
     }
   },
-  props: ['chartOption'],
+
   mounted() {
     this.barChart = echarts.init(this.$refs.chart)
     var option = {
@@ -35,14 +32,7 @@ export default {
         // left: '0px',
         // y: '280px',
         bottom: '0px',
-        data: [{
-          name: '存续本金',
-          icon: 'circle' //示例图标设为圆形
-        }, {
-          name: '存续利息',
-          icon: 'circle'
-        }],
-
+        data: [],
         itemwidth: 10, //示例图标宽度
         textStyle: {
           fontSize: 13, //示例文字size
@@ -55,25 +45,24 @@ export default {
         right: '0',
         bottom: '60px'
       },
-      xAxis: [{
+      xAxis: {
         type: 'category',
-        data: [2323]//this.barChart.dateArr
-      }],
-      yAxis: [{
-        type: 'value'
-      }],
-      series: [{
-        name: '存续本金',
-        type: 'bar',
-        stack: '广告',
-        data: [2323]//this.barChart.principalArr
-      }, {
-        name: '存续利息',
-        type: 'bar',
-        stack: '广告',
-        data: [2232]//this.barChart.interestArr
-      }],
-      color: ['#35cec3', '#b4becf']
+        data: [] //this.barChart.dateArr
+      },
+      yAxis: {
+        type: 'value',
+        splitLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        }
+      },
+      series: [],
+      color: ['#35cec3', '#b4becf'],
+      textStyle: {
+        fontFamily: 'Helvetica,microsoft yahei,Arial,Verdana,sans-serif'
+      }
     }
     this.barChart.setOption(_.extend({}, option, this.chartOption))
   },

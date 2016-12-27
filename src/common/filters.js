@@ -5,11 +5,11 @@ import numeral from 'numeral'
 export default {
   install(Vue, options) {
     Vue.filter('ktCurrency', (value, prefix = '￥', suffix = '') => {
-      return prefix + numeral(_.round(value, 2)).format('0,0.00') + suffix
-    })
-
-    Vue.filter('KtOverview', (value) => {
-      return numeral(_.round(value, 2)).format('0,0.00')
+      if (_.isNumber(value)) {
+        return prefix + numeral(_.round(value, 2)).format('0,0.00') + suffix
+      } else {
+        return value
+      }
     })
 
     Vue.filter('ktPercent', (value, decimal = 2, multi = 100, unit = '%') => {

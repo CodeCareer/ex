@@ -7,29 +7,29 @@
         h3 当前存续金额（元）
         .overview-left-middle
           i(class="icon-icomoon icon-overview")
-          span {{virtualAsset.balance | KtOverview}}
+          span {{virtualAsset.balance | ktCurrency('')}}
         .overview-left-down
           .Principal.fl
             span 存续本金
-              em.em-money {{virtualAsset.balance_principal | KtOverview}}
+              em.em-money {{virtualAsset.balance_principal | ktCurrency('')}}
           .Interest.fr
             span 存续利息
-              em.em-money {{virtualAsset.balance_interest | KtOverview}}
+              em.em-money {{virtualAsset.balance_interest | ktCurrency('')}}
       .overview-right.fr
         h3 已清算金额（元）
         .product-right-middle
           .overview-rm-top
-            span {{virtualAsset.settlement | ktOverview}}
+            span {{virtualAsset.settlement | ktCurrency('')}}
           .overview-rm-down
             .overivew-rmd-principal.fl
               span 已清算本金
-                em.em-money {{virtualAsset.settlement_principal | ktOverview}}
+                em.em-money {{virtualAsset.settlement_principal | ktCurrency('')}}
             .overview-rmd-interest.fr
               span 已清算利息
-                em.em-money {{virtualAsset.settlement_interest | ktOverview}}
+                em.em-money {{virtualAsset.settlement_interest | ktCurrency('')}}
         h3 累积募集金额（元）
         .overview-right-down
-          span {{virtualAsset.subscription_amount | ktOverview}}
+          span {{virtualAsset.subscription_amount | ktCurrency('')}}
     .today-detailed
       h2 今日明细
       .today-detailed-left.fl
@@ -102,7 +102,7 @@
       h2 存量情况
       .stock-all
         .stock-all-left.fl
-          bar-chart(:bar-echarts="stock")
+          kt-bar-chart(:chart-option="stockChartOption")
         .stock-all-right.fr
           h3 存量登记产品详情
           .table-one
@@ -184,12 +184,13 @@
             span 开放日：
             em {{virtualAsset.open_at |changeDate}}
 </template>
+
 <script>
 import exMixin from './mixin.js'
 import {
   Tooltip
 } from 'element-ui'
-import barChart from '../../components/kt-bar-echart.vue'
+import ktBarChart from '../../components/kt-bar-echart.vue'
 import {
   essentialInformation,
   productLiquidation,
@@ -200,29 +201,15 @@ import {
   // investor,
   // fees
 } from '../../common/resources.js'
+import _ from 'lodash'
+import moment from 'moment'
 
 export default {
   mixins: [exMixin],
   components: {
-    barChart,
+    ktBarChart,
     ElTooltip: Tooltip
   },
-  // directives: {
-  //   scroll: {
-  //     bind: function(el, binding) {
-  //       debugger
-  //       console.log(binding.expression)
-  //       el.addEventListener('scroll', () => {
-  //         debugger
-  //         if (el.scrollTop + el.clientHeight === el.scrollHeight) {
-  //           debugger
-  //           binding.expression.page += 1
-  //           this.registeredProductsGet()
-  //         }
-  //       })
-  //     }
-  //   }
-  // },
   methods: {
     essentialInformationGet() {
       essentialInformation.get({
@@ -256,19 +243,41 @@ export default {
       productStock.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
-        // let stockObj = {
-        //   dateArr: [],
-        //   principalArr: [],
-        //   interestArr: []
-        // }
-        // for (let i = 0; i < data.balance_trends.length; i++) {
-        //   stockObj.dateArr[i] = data.balance_trends[i].date
-        //   stockObj.principalArr[i] = data.balance_trends[i].principal
-        //   stockObj.interestArr[i] = data.balance_trends[i].interest
-        // }
-        // this.stock = stockObj
+        this.stockChartOption = _.merge({}, this.stockChartOption, {
+          legend: {
+            data: [{
+              name: '存续本金',
+              icon: 'circle' //示例图标设为圆形
+            }, {
+              name: '存续利息',
+              icon: 'circle'
+            }]
+          },
+          xAxis: [{
+            type: 'category',
+            data: _.map(data.balance_trends, v => moment(v.date).format('MM.DD')),
+            splitLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            }
+          }],
+          series: [{
+            name: '存续本金',
+            type: 'bar',
+            stack: '广告',
+            data: _.map(data.balance_trends, 'principal')
+          }, {
+            name: '存续利息',
+            type: 'bar',
+            stack: '广告',
+            data: _.map(data.balance_trends, 'interest')
+          }]
+        })
       })
     },
+
     registeredProductsGet() {
       registeredProducts.get({
         virtual_asset_id: this.$route.params.id,
@@ -277,6 +286,7 @@ export default {
         this.registeredProducts = this.registeredProducts.concat(data.registered_products)
       })
     },
+
     dropDown() {
       let dropdown = this.$refs.dropDown
       let registeredProductPagesObj = this.registeredProductPages
@@ -289,6 +299,7 @@ export default {
         }
       })
     }
+
     // investorGet() {
     //   investor.get({}).then(res => res.json()).then(data => {
 
@@ -298,6 +309,7 @@ export default {
     //   fees.get({}).then(res => res.json()).then(data => {})
     // }
   },
+
   mounted() {
     this.essentialInformationGet()
     this.productLiquidationGet()
@@ -309,17 +321,19 @@ export default {
       // this.feesGet()
     this.dropDown()
   },
+
   filters: {
     changeDate(value) {
       return value || '—'
     }
   },
+
   data() {
     return {
       virtualAsset: '',
       updated: '',
       settlement: '',
-      stock: '',
+      stockChartOption: {},
       registeredProducts: [],
       registeredProductPages: {
         page: 1,
@@ -329,13 +343,15 @@ export default {
   }
 }
 </script>
+
 <style lang="scss">
 .content {
   background: #ecf1f7;
   .h1 {
     font-size: 17px;
     color: #289685;
-    border-bottom: 2px solid #18b8ba;
+    border-bottom: 1px solid #18b8ba;
+    margin-bottom: 25px;
     width: 100%;
     height: 30px;
   }
@@ -677,7 +693,8 @@ export default {
     }
   }
 }
-.disable{
+
+.disable {
   color: #8e98a9;
   cursor: inherit;
 }
