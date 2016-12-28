@@ -132,7 +132,7 @@
             em {{virtualAsset.product_short_name |ktChangeDate}}
           li
             span 收益率：
-            em {{virtualAsset.annual_rate |ktChangeDate}}
+            em {{virtualAsset.annual_rate |ktPercent | ktChangeDate}}
           li
             span 募集总规模（元）：
             em {{virtualAsset.allocated_amount |ktCurrency |ktChangeDate}}
@@ -150,7 +150,7 @@
             em {{virtualAsset.increase_amount |ktCurrency|ktChangeDate}}
           li
             span 产品投向（范围）：
-            em {{virtualAsset.orientated_to |ktChangeDate}}
+            em(:class="{look:virtualAsset.orientated_to}",@click="look") {{virtualAsset.orientated_to |ktLook|ktChangeDate}}
           li
             span 产品风险等级：
             em {{virtualAsset.risk_level |ktChangeDate}}
@@ -226,10 +226,12 @@ export default {
       return productLiquidation.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
-        this.settlement = data
-      }).catch(data => {
-        this.todayQs = data.body.errors
-        this.todayQserror = false
+        if (data.errors) {
+          this.todayQs = data.errors
+          this.todayQserror = false
+        } else {
+          this.settlement = data
+        }
       })
     },
     updateGet() { //今日更新
@@ -237,9 +239,12 @@ export default {
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.updated = data
-      }).catch(data => {
-        this.todayUpdate = data.body.errors
-        this.todayUpdateerror = false
+        if (data.errors) {
+          this.todayUpdate = data.errors
+          this.todayUpdateerror = false
+        } else {
+          this.updated = data
+        }
       })
     },
     productExecutePost() { //产品执行post
@@ -342,6 +347,16 @@ export default {
           })
         }
       })
+    },
+    look() {
+      if (this.virtualAsset.orientated_to) {
+        MessageBox({
+          title: '产品投向（范围)',
+          message: this.virtualAsset.orientated_to
+        })
+      } else {
+        return
+      }
     }
     //单个登记产品下的客户 暂时预留
     // investorGet() {
@@ -378,8 +393,19 @@ export default {
   },
 
   filters: {
-    ktChangeDate(value) {
-      return value || '—'
+    ktReturnRate(value) {
+      if (value) {
+        return value * 100 + '%'
+      } else {
+        return value
+      }
+    },
+    ktLook(value) {
+      if (value) {
+        return '查看'
+      } else {
+        return value
+      }
     }
   },
 
@@ -416,6 +442,7 @@ export default {
   }
   h2 {
     margin-bottom: 10px;
+    font-size: 17px;
   }
 }
 
@@ -756,6 +783,10 @@ export default {
           display: inline-block;
           font-style: normal;
           color: #616a7b;
+        }
+        .look {
+          cursor: pointer;
+          color: #54c9b8;
         }
       }
     }

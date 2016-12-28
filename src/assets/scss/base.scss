@@ -80,7 +80,7 @@ body {
   /*宽度扩展到边框宽度              */
   box-sizing: border-box;
   -webkit-touch-callout: none;
-  user-select: none;
+  // user-select: none;
   /*页面元素不可复制     */
   -webkit-overflow-scrolling: touch;
   /*允许独立的滚动区域和触摸回弹     */

@@ -164,7 +164,7 @@ function updateQuery() {
       display: inline-block;
     }
     &.no-valid-value {
-      color: #c5c9d2;
+      color: #000;
     }
   }
   .buttons {
