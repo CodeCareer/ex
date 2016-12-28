@@ -33,6 +33,14 @@ export default {
     }
   },
 
+  watch: {
+    '$route' (to, from) {
+      if (to.name === from.name && to.fullPath !== from.fullPath) {
+        this.update()
+      }
+    }
+  },
+
   methods: {
     search() {
       let query = _.extend({}, defaultQuery, this.query)
@@ -58,22 +66,41 @@ export default {
         name: this.$route.name,
         query: defaultQuery
       })
+    },
+
+    update() {
+      let query = updateQuery.call(this)
+      this.query = query
     }
   },
 
   data() {
-    let params = this.$route.query || {}
-    let query = Object.assign({}, defaultQuery)
+    // let params = this.$route.query || {}
+    // let query = Object.assign({}, defaultQuery)
 
-    // 初始化select类型的filter值
-    _.each(_.flattenDeep(this.conditions), v => {
-      query[v.key] = params[v.key] || (v.type === 'select' ? (v.options[0].value || v.options[0].name) : null)
-    })
+    // // 初始化select类型的filter值
+    // _.each(_.flattenDeep(this.conditions), v => {
+    //   query[v.key] = params[v.key] || (v.type === 'select' ? (v.options[0].value || v.options[0].name) : null)
+    // })
+
+    let query = updateQuery.call(this)
 
     return {
       query: query
     }
   }
+}
+
+function updateQuery() {
+  let params = this.$route.query || {}
+  let query = Object.assign({}, defaultQuery)
+
+  // 初始化select类型的filter值
+  _.each(_.flattenDeep(this.conditions), v => {
+    query[v.key] = params[v.key] || (v.type === 'select' ? (v.options[0].value || v.options[0].name) : null)
+  })
+
+  return query
 }
 </script>
 
