@@ -41,11 +41,11 @@
             td
               router-link(:to='{name: "productDashboard", params: {id: p.id}}') {{p.name}}
             td {{p.balance | ktCurrency}}
-            td {{p.annual_rate | ktPercent |ktChangeDate}}
-            td {{p.sustained |ktChangeDate}}
-            td {{p.due_at |ktChangeDate}}
-            td {{p.open_type |ktChangeDate}}
-            td {{p.consignee |ktChangeDate}}
+            td {{p.annual_rate | ktPercent |ktChangeData}}
+            td {{p.sustained |ktChangeData}}
+            td {{p.due_at |ktChangeData}}
+            td {{p.open_type |ktChangeData}}
+            td {{p.consignee |ktChangeData}}
             td.status-column
               i.icon-icomoon(:class='p.update_status | updateStatusIcon')
               span {{p.update_status}}
