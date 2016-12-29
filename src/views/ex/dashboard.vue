@@ -49,8 +49,8 @@
                 span(v-if="product.outflow_desc") {{product.outflow_desc}}
                   em.green-color {{product.outflow | ktCurrency}}
               td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
-                span {{product.total_net_cash_flow >= 0 ? '净流入' : '净流出'}}
-                  em(:class="[product.total_net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
+                span {{product.net_cash_flow >= 0 ? '净流入' : '净流出'}}
+                  em(:class="[product.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
               td
                 span.bg-color {{product.execute_method}}
               td.implement.status-column

@@ -52,7 +52,7 @@
         .today-update
           h3 今日更新
             .update-data.fr(v-if="todayUpdateerror")
-              span.update-status.status-update
+              span.update-status.status-column
                 i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
                 em {{updated.update_status}}
                 el-tooltip(effect="dark",placement="top")
@@ -79,7 +79,7 @@
           .detailed-top-left.fl 全额结算
           .update-data.fr(v-if="todayQserror")
             span.update-status.status-column
-              i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
+              i.icon-icomoon(:class="settlement.execute_status | excuteStatusIcon")
               em {{settlement.execute_status}}
               el-tooltip(effect="dark",placement="top")
                 .Prompt(slot="content") 待执行-清算数据正常可以进行清算执行操作确认<br> 不可执行-清算数据尚未更新或者异常导致无法执行清算确认 <br> 已执行-已经进行过清算执行操作确认 <br> 已过期-当前时间已经晚于需确认清算执行的最晚时限

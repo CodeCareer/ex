@@ -213,11 +213,19 @@ $menuHeight: 40px;
     .icon-wait {
       & + span,
       & + em {
+        @extend .gray-color;
+      }
+      // &.ignore-status + span,
+      &.ignore-status + em {
         @extend .red-color;
       }
-      &.ignore-status + span,
-      &.ignore-status + em {
-        @extend .gray-color;
+      &.status-now+em{
+        @extend .green-color;
+      }
+    }
+    .icon-warn {
+      &+em{
+        @extend .red-color;
       }
     }
     .icon-success {
@@ -229,28 +237,28 @@ $menuHeight: 40px;
     }
   }
 }
-.status-update {
-  .icon-icomoon{
-    color:#c8cfd6;
-  }
-  .icon-wait{
-    &+em{
-      @extend .gray-color;
-    }
-    &.status-now+em{
-      @extend .green-color;
-    }
-  }
-  .icon-warn{
-    &+em{
-      @extend .red-color;
-    }
-  }
-  .icon-success{
-    &+em{
-      @extend .green-color;
-    }
-  }
+// .status-update {
+//   .icon-icomoon{
+//     color:#c8cfd6;
+//   }
+//   .icon-wait{
+//     &+em{
+//       @extend .gray-color;
+//     }
+//     &.status-now+em{
+//       @extend .green-color;
+//     }
+//   }
+//   .icon-warn{
+//     &+em{
+//       @extend .red-color;
+//     }
+//   }
+//   .icon-success{
+//     &+em{
+//       @extend .green-color;
+//     }
+//   }
 
-}
+// }
 </style>
