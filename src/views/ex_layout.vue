@@ -215,7 +215,7 @@ $menuHeight: 40px;
       & + em {
         @extend .gray-color;
       }
-      // &.ignore-status + span,
+      &.ignore-status + span,
       &.ignore-status + em {
         @extend .red-color;
       }
@@ -225,7 +225,7 @@ $menuHeight: 40px;
     }
     .icon-warn {
       &+em{
-        @extend .red-color;
+        @extend .gray-color;
       }
     }
     .icon-success {
