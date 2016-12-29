@@ -52,7 +52,7 @@
         .today-update
           h3 今日更新
             .update-data.fr(v-if="todayUpdateerror")
-              span.update-status
+              span.update-status.status-update
                 i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
                 em {{updated.update_status}}
                 el-tooltip(effect="dark",placement="top")
@@ -78,7 +78,7 @@
         .detailed-top
           .detailed-top-left.fl 全额结算
           .update-data.fr(v-if="todayQserror")
-            span.update-status
+            span.update-status.status-column
               i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
               em {{settlement.execute_status}}
               el-tooltip(effect="dark",placement="top")
