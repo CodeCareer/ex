@@ -126,64 +126,64 @@
         ul
           li
             span 产品全称：
-            em {{virtualAsset.name |ktChangeDate}}
+            em {{virtualAsset.name |ktChangeData}}
           li
             span 产品简称：
-            em {{virtualAsset.product_short_name |ktChangeDate}}
+            em {{virtualAsset.product_short_name |ktChangeData}}
           li
             span 收益率：
-            em {{virtualAsset.annual_rate |ktPercent | ktChangeDate}}
+            em {{virtualAsset.annual_rate |ktPercent | ktChangeData}}
           li
             span 募集总规模（元）：
-            em {{virtualAsset.allocated_amount |ktCurrency |ktChangeDate}}
+            em {{virtualAsset.allocated_amount |ktCurrency |ktChangeData}}
           li
             span 待发行金额（元）：
-            em {{virtualAsset.unissued_amount |ktCurrency |ktChangeDate}}
+            em {{virtualAsset.unissued_amount |ktCurrency |ktChangeData}}
           li
             span 兑付总额：
-            em {{virtualAsset.cash_amount |ktCurrency |ktChangeDate}}
+            em {{virtualAsset.cash_amount |ktCurrency |ktChangeData}}
           li
             span 起购金额（元）：
-            em {{virtualAsset.min_subscription_amount |ktCurrency|ktChangeDate}}
+            em {{virtualAsset.min_subscription_amount |ktCurrency|ktChangeData}}
           li
             span 递增金额（元）：
-            em {{virtualAsset.increase_amount |ktCurrency|ktChangeDate}}
+            em {{virtualAsset.increase_amount |ktCurrency|ktChangeData}}
           li
             span 产品投向（范围）：
-            em(:class="{look:virtualAsset.orientated_to}",@click="look") {{virtualAsset.orientated_to |ktLook|ktChangeDate}}
+            em(:class="{look:virtualAsset.orientated_to}",@click="look") {{virtualAsset.orientated_to |ktLook|ktChangeData}}
           li
             span 产品风险等级：
-            em {{virtualAsset.risk_level |ktChangeDate}}
+            em {{virtualAsset.risk_level |ktChangeData}}
       .essential-information-right.fr.essential-information-all
         h3 关键日期和期限
         ul
           li
             span 上架时间 ：
-            em {{virtualAsset.published_start_at |ktChangeDate}}
+            em {{virtualAsset.published_start_at |ktChangeData}}
           li
             span 下架时间 ：
-            em {{virtualAsset.published_end_at | ktChangeDate}}
+            em {{virtualAsset.published_end_at | ktChangeData}}
           li
             span 募集期（天）：
-            em {{virtualAsset.reserved_sustained |ktChangeDate}}
+            em {{virtualAsset.reserved_sustained |ktChangeData}}
           li
             span 起息日：
-            em {{virtualAsset.value_at | ktChangeDate}}
+            em {{virtualAsset.value_at | ktChangeData}}
           li
             span 到期日：
-            em {{virtualAsset.due_at | ktChangeDate}}
+            em {{virtualAsset.due_at | ktChangeData}}
           li
             span 还款日：
-            em {{virtualAsset.repayment_at | ktChangeDate}}
+            em {{virtualAsset.repayment_at | ktChangeData}}
           li
             span 期限：
-            em {{virtualAsset.sustained |ktChangeDate}}
+            em {{virtualAsset.sustained |ktChangeData}}
           li
             span 开放间隔期（天）：
-            em {{virtualAsset.open_cycle |ktChangeDate}}
+            em {{virtualAsset.open_cycle |ktChangeData}}
           li
             span 开放日：
-            em {{virtualAsset.open_at |ktChangeDate}}
+            em {{virtualAsset.open_at |ktChangeData}}
 </template>
 
 <script>

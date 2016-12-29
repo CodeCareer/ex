@@ -41,7 +41,7 @@
             td
               router-link(:to='{name: "productDashboard", params: {id: p.id}}') {{p.name}}
             td {{p.balance | ktCurrency}}
-            td {{p.annual_rate | ktPercent}}
+            td {{p.annual_rate | ktPercent |ktChangeDate}}
             td {{p.sustained |ktChangeDate}}
             td {{p.due_at |ktChangeDate}}
             td {{p.open_type |ktChangeDate}}

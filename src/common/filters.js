@@ -11,7 +11,7 @@ export default {
         return value
       }
     })
-    Vue.filter('ktChangeDate', (value) => {
+    Vue.filter('ktChangeData', (value) => {
       return value || '-'
     })
 
