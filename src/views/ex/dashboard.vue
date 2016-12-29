@@ -40,17 +40,17 @@
               th {{key}}
           tbody(v-for="product in item")
             tr(@click="toDetails(product)")
-              td
+              td(:title="product.name")
                 span {{product.name}}
-              td
+              td(:title="product.inflow | ktCurrency")
                 span(v-if="product.inflow_desc") {{product.inflow_desc}}
                   em.red-color {{product.inflow | ktCurrency}}
-              td
+              td(:title="product.outflow | ktCurrency")
                 span(v-if="product.outflow_desc") {{product.outflow_desc}}
                   em.green-color {{product.outflow | ktCurrency}}
-              td
+              td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
                 span {{product.inflow >= product.outflow ? '净流入' : '净流出'}}
-                  em(:class="[product.inflow >= product.outflow ? 'red-color' : 'green-color']") {{product.net_cash_flow  | ktCurrency}}
+                  em(:class="[product.inflow >= product.outflow ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
               td
                 span.bg-color {{product.execute_method}}
               td.implement.status-column

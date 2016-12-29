@@ -15,6 +15,14 @@ export default {
       return value || '-'
     })
 
+    Vue.filter('ktFlow', (value) => {
+      if (value > 0) {
+        return value
+      } else {
+        return -(value)
+      }
+    })
+
     Vue.filter('ktPercent', (value, decimal = 2, multi = 100, unit = '%') => {
       return _.isNumber(value) ? _.round(value * multi, decimal).toFixed(decimal) + (unit || '') : ''
     })
