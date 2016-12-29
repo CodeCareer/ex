@@ -46,8 +46,8 @@
                     span(v-if="settlement.total_outflow_desc") {{settlement.total_outflow_desc}}
                       em.green-color {{settlement.total_outflow | ktCurrency}}
                   td
-                    span {{updated.total_inflow >= updated.total_outflow?'净流入':'净流出'}}
-                      em(:class="[updated.total_inflow >= updated.total_outflow?'red-color':'green-color']") {{settlement.total_net_cash_flow | ktFlow | ktCurrency}}
+                    span {{settlement.total_net_cash_flow >= 0?'净流入':'净流出'}}
+                      em(:class="[settlement.total_net_cash_flow >= 0?'red-color':'green-color']") {{settlement.total_net_cash_flow | ktFlow | ktCurrency}}
           .update-square(v-if="!todayQserror") {{todayQs}}
         .today-update
           h3 今日更新
@@ -71,8 +71,8 @@
                     span {{updated.total_outflow_desc}}
                       em.green-color {{updated.total_outflow | ktCurrency}}
                   td
-                    span {{updated.total_inflow >= updated.total_outflow?'净流入':'净流出'}}
-                      em(:class="[updated.total_inflow >= updated.total_outflow?'red-color':'green-color']") {{updated.total_net_cash_flow | ktFlow | ktCurrency}}
+                    span {{settlement.total_net_cash_flow >= 0?'净流入':'净流出'}}
+                      em(:class="[settlement.total_net_cash_flow >= 0?'red-color':'green-color']") {{updated.total_net_cash_flow | ktFlow | ktCurrency}}
           .update-square(v-if="!todayUpdateerror") {{todayUpdate}}
       .today-detailed-right.fr
         .detailed-top
