@@ -84,7 +84,7 @@
               el-tooltip(effect="dark",placement="top")
                 .Prompt(slot="content") 待执行-清算数据正常可以进行清算执行操作确认<br> 不可执行-清算数据尚未更新或者异常导致无法执行清算确认 <br> 已执行-已经进行过清算执行操作确认 <br> 已过期-当前时间已经晚于需确认清算执行的最晚时限
                 i(class="icon-icomoon icon-explain")
-            span.update-time(v-if="settlement.execute_status === '待执行'?true:false") 更新时间
+            span.update-time(v-if="settlement.execute_status === '待执行'?true:false") 结算时限
               em {{settlement.execute_at}}
 
         .detailed-middle
