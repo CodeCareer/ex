@@ -26,7 +26,7 @@ export default {
         show: true,
         trigger: 'item',
         formatter: (params, ticket, callback) => {
-          return '<div style="text-align:center; font-size:14px;">' + params.name + params.name + '<br/>' + Vue.filter('ktCurrency')(params.value) + '(' + params.percent + '%)' + '</div>'
+          return '<div style="text-align:center; font-size:14px;">' + params.name + '<br/>' + Vue.filter('ktCurrency')(params.value) + '(' + params.percent + '%)' + '</div>'
         }
       },
       color: ['#21a9e1', '#35cbef', '#1fdab1', '#92e68d'],

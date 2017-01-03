@@ -46,13 +46,13 @@
                     span(v-if="settlement.total_outflow_desc") {{settlement.total_outflow_desc}}
                       em.green-color {{settlement.total_outflow | ktCurrency}}
                   td
-                    span {{updated.total_inflow >= updated.total_outflow?'净流入':'净流出'}}
-                      em(class="[updated.total_inflow >= updated.total_outflow?'red-color':'green-color']") {{settlement.total_net_cash_flow | ktCurrency}}
+                    span {{settlement.total_net_cash_flow >= 0?'净流入':'净流出'}}
+                      em(:class="[settlement.total_net_cash_flow >= 0?'red-color':'green-color']") {{settlement.total_net_cash_flow | ktFlow | ktCurrency}}
           .update-square(v-if="!todayQserror") {{todayQs}}
         .today-update
           h3 今日更新
             .update-data.fr(v-if="todayUpdateerror")
-              span.update-status
+              span.update-status.status-column
                 i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
                 em {{updated.update_status}}
                 el-tooltip(effect="dark",placement="top")
@@ -71,20 +71,20 @@
                     span {{updated.total_outflow_desc}}
                       em.green-color {{updated.total_outflow | ktCurrency}}
                   td
-                    span {{updated.total_inflow >= updated.total_outflow?'净流入':'净流出'}}
-                      em {{updated.total_net_cash_flow | ktCurrency}}
+                    span {{updated.total_net_cash_flow >= 0?'净流入':'净流出'}}
+                      em(:class="[updated.total_net_cash_flow >= 0?'red-color':'green-color']") {{updated.total_net_cash_flow | ktFlow | ktCurrency}}
           .update-square(v-if="!todayUpdateerror") {{todayUpdate}}
       .today-detailed-right.fr
         .detailed-top
           .detailed-top-left.fl 全额结算
           .update-data.fr(v-if="todayQserror")
-            span.update-status
-              i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
+            span.update-status.status-column
+              i.icon-icomoon(:class="settlement.execute_status | excuteStatusIcon")
               em {{settlement.execute_status}}
               el-tooltip(effect="dark",placement="top")
                 .Prompt(slot="content") 待执行-清算数据正常可以进行清算执行操作确认<br> 不可执行-清算数据尚未更新或者异常导致无法执行清算确认 <br> 已执行-已经进行过清算执行操作确认 <br> 已过期-当前时间已经晚于需确认清算执行的最晚时限
                 i(class="icon-icomoon icon-explain")
-            span.update-time(v-if="settlement.execute_status === '待执行'?true:false") 更新时间
+            span.update-time(v-if="settlement.execute_status === '待执行'?true:false") 结算时限
               em {{settlement.execute_at}}
 
         .detailed-middle
@@ -126,68 +126,69 @@
         ul
           li
             span 产品全称：
-            em {{virtualAsset.name |ktChangeDate}}
+            em {{virtualAsset.name |ktChangeData}}
           li
             span 产品简称：
-            em {{virtualAsset.product_short_name |ktChangeDate}}
+            em {{virtualAsset.product_short_name |ktChangeData}}
           li
             span 收益率：
-            em {{virtualAsset.annual_rate |ktChangeDate}}
+            em {{virtualAsset.annual_rate |ktPercent | ktChangeData}}
           li
             span 募集总规模（元）：
-            em {{virtualAsset.allocated_amount |ktCurrency |ktChangeDate}}
+            em {{virtualAsset.allocated_amount |ktCurrency |ktChangeData}}
           li
             span 待发行金额（元）：
-            em {{virtualAsset.unissued_amount |ktCurrency |ktChangeDate}}
+            em {{virtualAsset.unissued_amount |ktCurrency |ktChangeData}}
           li
             span 兑付总额：
-            em {{virtualAsset.cash_amount |ktCurrency |ktChangeDate}}
+            em {{virtualAsset.cash_amount |ktCurrency |ktChangeData}}
           li
             span 起购金额（元）：
-            em {{virtualAsset.min_subscription_amount |ktCurrency|ktChangeDate}}
+            em {{virtualAsset.min_subscription_amount |ktCurrency|ktChangeData}}
           li
             span 递增金额（元）：
-            em {{virtualAsset.increase_amount |ktCurrency|ktChangeDate}}
+            em {{virtualAsset.increase_amount |ktCurrency|ktChangeData}}
           li
             span 产品投向（范围）：
-            em {{virtualAsset.orientated_to |ktChangeDate}}
+            em(:class="{look:virtualAsset.orientated_to}",@click="look") {{virtualAsset.orientated_to |ktLook|ktChangeData}}
           li
             span 产品风险等级：
-            em {{virtualAsset.risk_level |ktChangeDate}}
+            em {{virtualAsset.risk_level |ktChangeData}}
       .essential-information-right.fr.essential-information-all
         h3 关键日期和期限
         ul
           li
             span 上架时间 ：
-            em {{virtualAsset.published_start_at |ktChangeDate}}
+            em {{virtualAsset.published_start_at |ktChangeData}}
           li
             span 下架时间 ：
-            em {{virtualAsset.published_end_at | ktChangeDate}}
+            em {{virtualAsset.published_end_at | ktChangeData}}
           li
             span 募集期（天）：
-            em {{virtualAsset.reserved_sustained |ktChangeDate}}
+            em {{virtualAsset.reserved_sustained |ktChangeData}}
           li
             span 起息日：
-            em {{virtualAsset.value_at | ktChangeDate}}
+            em {{virtualAsset.value_at | ktChangeData}}
           li
             span 到期日：
-            em {{virtualAsset.due_at | ktChangeDate}}
+            em {{virtualAsset.due_at | ktChangeData}}
           li
             span 还款日：
-            em {{virtualAsset.repayment_at | ktChangeDate}}
+            em {{virtualAsset.repayment_at | ktChangeData}}
           li
             span 期限：
-            em {{virtualAsset.sustained |ktChangeDate}}
+            em {{virtualAsset.sustained |ktChangeData}}
           li
             span 开放间隔期（天）：
-            em {{virtualAsset.open_cycle |ktChangeDate}}
+            em {{virtualAsset.open_cycle |ktChangeData}}
           li
             span 开放日：
-            em {{virtualAsset.open_at |ktChangeDate}}
+            em {{virtualAsset.open_at |ktChangeData}}
 </template>
 
 <script>
 import exMixin from './mixin.js'
+import Vue from 'vue'
 import {
   MessageBox,
   Message,
@@ -226,10 +227,12 @@ export default {
       return productLiquidation.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
-        this.settlement = data
-      }).catch(data => {
-        this.todayQs = data.body.errors
-        this.todayQserror = false
+        if (data.errors) {
+          this.todayQs = data.errors
+          this.todayQserror = false
+        } else {
+          this.settlement = data
+        }
       })
     },
     updateGet() { //今日更新
@@ -237,9 +240,12 @@ export default {
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.updated = data
-      }).catch(data => {
-        this.todayUpdate = data.body.errors
-        this.todayUpdateerror = false
+        if (data.errors) {
+          this.todayUpdate = data.errors
+          this.todayUpdateerror = false
+        } else {
+          this.updated = data
+        }
       })
     },
     productExecutePost() { //产品执行post
@@ -254,6 +260,11 @@ export default {
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.stockChartOption = _.merge({}, this.stockChartOption, {
+          tooltip: {
+            formatter: (params, ticket, callback) => {
+              return '<div>' + params[0].name + '<br/>' + params[0].seriesName + ':' + Vue.filter('ktCurrency')(params[0].value) + '<br/>' + params[1].seriesName + ':' + Vue.filter('ktCurrency')(params[1].value) + '</div>'
+            }
+          },
           legend: {
             data: [{
               name: '存续本金',
@@ -309,7 +320,7 @@ export default {
       let dropdown = this.$refs.dropDown
       let registeredProductPagesObj = this.registeredProductPages
       dropdown.addEventListener('scroll', (ev) => {
-        if (dropdown.scrollTop + dropdown.clientHeight === dropdown.scrollHeight) {
+        if (dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 10) {
           registeredProductPagesObj.page += 1
           this.registeredProductsGet()
         }
@@ -342,6 +353,16 @@ export default {
           })
         }
       })
+    },
+    look() {
+      if (this.virtualAsset.orientated_to) {
+        MessageBox({
+          title: '产品投向（范围)',
+          message: this.virtualAsset.orientated_to
+        })
+      } else {
+        return
+      }
     }
     //单个登记产品下的客户 暂时预留
     // investorGet() {
@@ -378,8 +399,19 @@ export default {
   },
 
   filters: {
-    ktChangeDate(value) {
-      return value || '—'
+    ktReturnRate(value) {
+      if (value) {
+        return value * 100 + '%'
+      } else {
+        return value
+      }
+    },
+    ktLook(value) {
+      if (value) {
+        return '查看'
+      } else {
+        return value
+      }
     }
   },
 
@@ -416,6 +448,7 @@ export default {
   }
   h2 {
     margin-bottom: 10px;
+    font-size: 17px;
   }
 }
 
@@ -756,6 +789,10 @@ export default {
           display: inline-block;
           font-style: normal;
           color: #616a7b;
+        }
+        .look {
+          cursor: pointer;
+          color: #54c9b8;
         }
       }
     }

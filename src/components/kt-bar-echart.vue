@@ -41,7 +41,7 @@ export default {
       },
       grid: {
         show: false,
-        left: '60px',
+        left: '100px',
         right: '0',
         bottom: '60px'
       },
@@ -77,7 +77,7 @@ export default {
 
 <style lang="scss">
 .bar-echart {
-  min-width: 500px;
+  min-width: 550px;
   height: 100%;
   margin: 0 auto;
 }
