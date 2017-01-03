@@ -151,6 +151,8 @@ export default {
             name: '更新中'
           }, {
             name: '待更新'
+          }, {
+            name: '异常'
           }]
         }, {
           name: '执行状态',
