@@ -28,7 +28,11 @@
                 i.icon-icomoon.icon-arrow-top.desc
             th 产品类型
             th 发行平台
-            th 更新状态
+            th.order-column(:class='[{active: query.sort_by === "update_status"}, query.order]', @click='sortBy("update_status")')
+              | 更新状态
+              span.icon-order-group
+                i.icon-icomoon.icon-arrow-top.asc
+                i.icon-icomoon.icon-arrow-top.desc
             th.order-column(:class='[{active: query.sort_by === "execute_status"}, query.order]', @click='sortBy("execute_status")')
               | 执行状态
               span.icon-order-group

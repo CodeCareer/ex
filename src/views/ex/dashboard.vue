@@ -59,6 +59,45 @@
               td
                 span(v-show="product.execute_status === '待执行' ? true : false") 结算时限:
                   em {{product.due_at}}
+    .today-square
+      h2 今日更新
+        el-tooltip(effect="dark",placement="right")
+          .Prompt(slot="content") 展示今日需数据更新的所有产品，包括今日销售数据和赎回数据的传输 <br> 已更新-本期更新数据已经传输和处理完毕 <br> 待更新-本期应该有更新数据但尚未开始传输 <br> 更新中-本期更新数据正在传输或处理中 <br> 异常-当前时间已经晚于数据更新的最晚截止时间但仍未传输或处理完毕
+          i(class="icon-icomoon icon-explain")
+        .information.fr
+          span {{updateSummary.updated}}
+          em 条 已更新，
+          span {{updateSummary.pending_update}}
+          em 条 待更新，
+          span {{updateSummary.updating}}
+          em 条 更新中，
+          span {{updateSummary.abnormal}}
+          em 条 异常
+      .overview-table
+        table(v-for="(item,key) in updateVas")
+          thead
+            tr
+              th {{key}}
+          tbody(v-for="product in item")
+            tr(@click="toDetails(product)")
+              td(:title="product.name")
+                span {{product.name}}
+              td(:title="product.inflow | ktCurrency")
+                span(v-if="product.inflow_desc") {{product.inflow_desc}}
+                  em.red-color {{product.inflow | ktCurrency}}
+              td(:title="product.outflow | ktCurrency")
+                span(v-if="product.outflow_desc") {{product.outflow_desc}}
+                  em.green-color {{product.outflow | ktCurrency}}
+              td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
+                span {{product.net_cash_flow >= 0 ? '净流入' : '净流出'}}
+                  em(:class="[product.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
+              td
+              td.implement.status-column
+                i.icon-icomoon(:class="product.update_status | updateStatusIcon")
+                em.em-implement {{product.update_status}}
+              td
+                span(v-show="product.update_status === '已更新' ? true : false") 更新时间:
+                  em {{product.updated_at}}
 </template>
 
 <script>
@@ -66,7 +105,8 @@ import _ from 'lodash'
 import {
   subsist,
   stock,
-  liquidation
+  liquidation,
+  updatedProducts
 } from '../../common/resources.js'
 import KtPieEchart from '../../components/kt-pie-echart.vue'
 import {
@@ -149,6 +189,14 @@ export default {
         this.summary = data.summary
         this.virtualAssets = _.groupBy(data.virtual_assets, v => v.consignee)
       })
+    },
+
+    // 今日更新
+    updatedProductsGet() {
+      return updatedProducts.get().then(res => res.json()).then(data => {
+        this.updateSummary = data.summary
+        this.updateVas = _.groupBy(data.virtual_assets, v => v.consignee)
+      })
     }
   },
 
@@ -160,7 +208,8 @@ export default {
     Promise.all([
       this.subsistGet(),
       this.stockGet(),
-      this.liquidationGet()
+      this.liquidationGet(),
+      this.updatedProductsGet()
     ]).then(() => {
       this.instLoading.close()
     }).catch(res => {
@@ -173,7 +222,9 @@ export default {
       balance: '',
       pieChartOption: {},
       summary: '',
-      virtualAssets: ''
+      virtualAssets: '',
+      updateSummary: '',
+      updateVas: ''
     }
   }
 }
