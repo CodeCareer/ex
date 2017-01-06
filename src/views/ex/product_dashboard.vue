@@ -99,27 +99,6 @@
               span 开户行:
               em {{virtualAsset.consignee_bank_name}}
           .sure(:class="[settlement.execute_status === '待执行' ? '' : 'disabled']", @click.prevent="submit") 确认执行
-    .stock
-      h2 存量情况
-      .stock-all
-        .stock-all-left.fl
-          kt-bar-chart(:chart-option="stockChartOption")
-        .stock-all-right.fr
-          h3 存量登记产品详情
-          .table-one
-            table
-              tbody
-                tr
-                  td 产品代码
-                  td 规模
-                  td 客户数量
-          .table-two(ref="dropDown")
-            table
-              tbody
-                tr(v-for="registeredProduct in registeredProducts")
-                  td {{registeredProduct.product_code}}
-                  td {{registeredProduct.balance | ktCurrency}}
-                  td {{registeredProduct.investor_count}}
     .essential-information
       .essential-information-left.fl.essential-information-all
         h3 基本信息
@@ -184,6 +163,27 @@
           li
             span 开放日：
             em {{virtualAsset.open_at |ktChangeData}}
+    .stock
+      h2 存量情况
+      .stock-all
+        .stock-all-left.fl
+          kt-bar-chart(:chart-option="stockChartOption")
+        .stock-all-right.fr
+          h3 存量登记产品详情
+          .table-one
+            table
+              tbody
+                tr
+                  td 产品代码
+                  td 规模
+                  td 客户数量
+          .table-two(ref="dropDown")
+            table
+              tbody
+                tr(v-for="registeredProduct in registeredProducts")
+                  td {{registeredProduct.product_code}}
+                  td {{registeredProduct.balance | ktCurrency}}
+                  td {{registeredProduct.investor_count}}
 </template>
 
 <script>
