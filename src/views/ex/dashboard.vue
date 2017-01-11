@@ -62,7 +62,7 @@
     .today-square
       h2 今日更新
         el-tooltip(effect="dark",placement="right")
-          .Prompt(slot="content") 展示今日需数据更新的所有产品，包括今日销售数据和赎回数据的传输 <br> 已更新-本期更新数据已经传输和处理完毕 <br> 待更新-本期应该有更新数据但尚未开始传输 <br> 更新中-本期更新数据正在传输或处理中 <br> 异常-当前时间已经晚于数据更新的最晚截止时间但仍未传输或处理完毕
+          .Prompt(slot="content") 展示今日需数据更新的所有产品 <br> 已更新-本期更新数据已经传输和处理完毕 <br> 待更新-本期应该有更新数据但尚未开始传输 <br> 更新中-本期更新数据正在传输或处理中 <br> 异常-当前时间已经晚于数据更新的最晚截止时间但仍未传输或处理完毕
           i(class="icon-icomoon icon-explain")
         .information.fr
           span {{updateSummary.updated}}

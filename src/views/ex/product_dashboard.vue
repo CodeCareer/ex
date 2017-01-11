@@ -110,10 +110,10 @@
             span 产品简称：
             em {{virtualAsset.product_short_name |ktChangeData}}
           li
-            span 收益率：
+            span 发行利率：
             em {{virtualAsset.annual_rate |ktPercent | ktChangeData}}
           li
-            span 募集总规模（元）：
+            span 计划募集金额（元）：
             em {{virtualAsset.allocated_amount |ktCurrency |ktChangeData}}
           li
             span 待发行金额（元）：
@@ -137,10 +137,10 @@
         h3 关键日期和期限
         ul
           li
-            span 上架时间 ：
+            span 上架日期 ：
             em {{virtualAsset.published_start_at |ktChangeData}}
           li
-            span 下架时间 ：
+            span 下架日期 ：
             em {{virtualAsset.published_end_at | ktChangeData}}
           li
             span 募集期（天）：
@@ -155,7 +155,7 @@
             span 还款日：
             em {{virtualAsset.repayment_at | ktChangeData}}
           li
-            span 期限：
+            span 发行期限：
             em {{virtualAsset.sustained |ktChangeData}}
           li
             span 开放间隔期（天）：
