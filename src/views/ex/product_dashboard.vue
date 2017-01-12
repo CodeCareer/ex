@@ -640,6 +640,7 @@ export default {
         display:table-row;
         line-height: 35px;
         span {
+          width:30%;
           text-align: right;
           min-width: 80px;
           margin-right: 10px;
