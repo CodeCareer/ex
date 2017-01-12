@@ -21,15 +21,23 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-select-down:before {
+.icon-calendar:before {
+  content: "\e90b";
+}
+
+.icon-plus:before {
+  content: "\e90c";
+}
+
+.icon-selectDown:before {
   content: "\e907";
 }
 
-.icon-arrow-down:before {
+.icon-scorDown:before {
   content: "\e908";
 }
 
-.icon-arrow-top:before {
+.icon-scorTop:before {
   content: "\e909";
 }
 

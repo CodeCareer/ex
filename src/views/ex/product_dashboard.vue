@@ -1,6 +1,11 @@
 <template lang="pug">
   .content
     .h1 {{virtualAsset.name}}
+      small(v-if="virtualAsset.type === 'origin'") 产品代码：
+        span {{virtualAsset.product_code}}
+      .right
+        button.kt-btn.kt-btn-primary(@click="editProduct(virtualAsset)", :class="{disabled: virtualAsset.type !== 'origin'}") 编辑
+        button.kt-btn.kt-btn-gray(@click="deleteProductChild(virtualAsset)", :class="{disabled: virtualAsset.type !== 'origin'}") 删除
     .today-overview
       h2 今日总览
       .overview-left.fl
@@ -216,6 +221,12 @@ export default {
     ElTooltip: Tooltip
   },
   methods: {
+    deleteProductChild(product) {
+      this.deleteProduct(product).then(() => {
+        this.$router.back()
+      })
+    },
+
     essentialInformationGet() { //产品基本信息
       return essentialInformation.get({
         virtual_asset_id: this.$route.params.id
@@ -223,6 +234,7 @@ export default {
         this.virtualAsset = data.virtual_asset
       })
     },
+
     productLiquidationGet() { //近期清算
       return productLiquidation.get({
         virtual_asset_id: this.$route.params.id
@@ -235,6 +247,7 @@ export default {
         }
       })
     },
+
     updateGet() { //今日更新
       return update.get({
         virtual_asset_id: this.$route.params.id
@@ -248,6 +261,7 @@ export default {
         }
       })
     },
+
     productExecutePost() { //产品执行post
       return productExecute.save({
         virtual_asset_id: this.$route.params.id
@@ -255,6 +269,7 @@ export default {
         this.settlement.execute_status = data.execute_status
       })
     },
+
     productStockGet() { //单个产品的存量图表
       return productStock.get({
         virtual_asset_id: this.$route.params.id
@@ -439,12 +454,25 @@ export default {
 .content {
   background: #ecf1f7;
   .h1 {
-    font-size: 17px;
-    color: #289685;
-    border-bottom: 1px solid #18b8ba;
-    margin-bottom: 25px;
+    border-radius: 4px;
+    font-size: 19px;
+    color: white;
+    background: #79859a;
+    // border-bottom: 1px solid #18b8ba;
+    margin-bottom: 20px;
+    padding-left: 17px;
+    padding-right: 10px;
     width: 100%;
-    height: 30px;
+    height: 38px;
+    line-height: 38px;
+    small {
+      margin-left: 20px;
+      font-size: 13px;
+    }
+    .right {
+      float: right;
+      line-height: 1.7;
+    }
   }
   h2 {
     margin-bottom: 10px;

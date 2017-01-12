@@ -48,6 +48,14 @@ export default [{
         title: '开通金融-交易所产品管理系统-登记产品总列表',
         needLogin: true
       }
+    }, {
+      path: ':id/edit',
+      name: 'productForm',
+      component: resolve => require(['../views/ex/products/product_form.vue'], resolve),
+      meta: {
+        title: '开通金融-交易所产品管理系统-产品表单',
+        needLogin: true
+      }
     }]
   }]
 }, {

@@ -36,6 +36,16 @@ select {
     &:active {
       background: darken($primary_color, 5%);
     }
+    &[disabled],
+    &.disabled {
+      cursor: not-allowed;
+      color: darken(white, 10%);
+      background: lighten($primary_color, 10%)!important;
+      &:hover,
+      &:active {
+        background: lighten($primary_color, 10%)!important;
+      }
+    }
   }
   &.kt-btn-gray {
     $gray: #96a3ba;
@@ -46,6 +56,16 @@ select {
     }
     &:active {
       background: darken($gray, 5%);
+    }
+    &[disabled],
+    &.disabled {
+      cursor: not-allowed;
+      color: darken(white, 10%);
+      background: lighten($gray, 10%)!important;
+      &:hover,
+      &:active {
+        background: lighten($gray, 10%)!important;
+      }
     }
   }
 }

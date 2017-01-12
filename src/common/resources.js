@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 let sessions, accounts, products, registerProducts, subsist, stock, liquidation,
   essentialInformation, productLiquidation, update, productExecute, productStock,
-  registeredProducts, investor, fees, updatedProducts
+  registeredProducts, investor, fees, updatedProducts, productOne
 
 let previousRequestMap = {}
 let commonOpts = {
@@ -18,10 +18,11 @@ let commonOpts = {
 }
 
 export default function setResources(resource) {
-  sessions = resource('sessions', {}, {}, commonOpts) // 新闻
-  accounts = resource('accounts', {}, {}, commonOpts) // 新闻
-  products = resource('virtual_assets/all', {}, {}, commonOpts) // 新闻
-  registerProducts = resource('registered_products', {}, {}, commonOpts) // 新闻
+  sessions = resource('sessions', {}, {}, commonOpts) // 登录
+  accounts = resource('accounts', {}, {}, commonOpts) // 账户信息
+  products = resource('virtual_assets/all', {}, {}, commonOpts) // 总产品列表
+  productOne = resource('{virtual_assets{/virtual_asset_id}', {}, {}, commonOpts) // 产品删除
+  registerProducts = resource('registered_products', {}, {}, commonOpts) // 注册产品列表
   subsist = resource('statistics/balance', {}, {}, commonOpts) //存续金额
   stock = resource('statistics/balance/breakdown', {}, {}, commonOpts) //产品存量占比
   liquidation = resource('virtual_assets/settlement', {}, {}, commonOpts) //清算
@@ -41,6 +42,7 @@ export {
   accounts,
   registerProducts,
   products,
+  productOne,
   subsist,
   stock,
   liquidation,

@@ -1,6 +1,10 @@
 <template lang="pug">
   section.products
-    kt-tabs
+    .buttons-topbar
+      router-link.kt-btn.kt-btn-primary(:to='{name: "productForm", params:{id: "new"}}')
+        i.icon-icomoon.icon-plus
+        | 新增
+    kt-tabs(v-if='$route.name === "productsAll" || $route.name === "productsRegister"')
       kt-tab-item(:class="{'is-active': $route.name === 'productsAll'}")
         router-link(:to='{name: "productsAll"}') 产品总列表
       kt-tab-item(:class="{'is-active': $route.name === 'productsRegister'}")
@@ -33,6 +37,13 @@ export default {
 
 <style lang="scss">
 .products {
+  position: relative;
+  .buttons-topbar {
+    position: absolute;
+    top: 0;
+    line-height: 35px;
+    right: 10px;
+  }
   .el-tabs {
     vertical-align: top;
   }

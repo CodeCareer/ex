@@ -1,0 +1,43 @@
+.kt-panel {
+  background: white;
+  border-radius: 4px;
+  .panel-head {
+    border-radius: 4px 4px 0 0;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 20px;
+    background: #b4becf;
+    color: white;
+    font-size: 15px;
+  }
+  .panel-body {
+    padding: 10px;
+    .panel-body-title {
+      line-height: 34px;
+      font-size: 15px;
+      color: #9b9ea9;
+      background: #eff2f8;
+      text-align: center;
+    }
+    .form-block {
+      padding: 20px 0;
+      .left,
+      .right {
+        width: 50%;
+        float: left;
+        .el-input-group,
+        .el-form-item__content {
+          width: 285px;
+        }
+        .el-autocomplete {
+          width: 285px;
+        }
+      }
+    }
+    .form-footer {
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+    }
+  }
+}
