@@ -262,7 +262,10 @@ export default {
         this.stockChartOption = _.merge({}, this.stockChartOption, {
           tooltip: {
             formatter: (params, ticket, callback) => {
-              return '<div>' + params[0].name + '<br/>' + params[0].seriesName + ':' + Vue.filter('ktCurrency')(params[0].value) + '<br/>' + params[1].seriesName + ':' + Vue.filter('ktCurrency')(params[1].value) + '</div>'
+              if (!params.length) return
+              return _.concat([`<div>${params[0].name}`], params.map(v => {
+                return `<p>${v.seriesName}:${Vue.filter('ktCurrency')(v.value)}</p>`
+              }), '</div>').join('')
             }
           },
           legend: {
@@ -288,12 +291,14 @@ export default {
             name: '存续本金',
             type: 'bar',
             stack: '广告',
-            data: _.map(data.balance_trends, 'principal')
+            data: _.map(data.balance_trends, 'principal'),
+            barMaxWidth: 40
           }, {
             name: '存续利息',
             type: 'bar',
             stack: '广告',
-            data: _.map(data.balance_trends, 'interest')
+            data: _.map(data.balance_trends, 'interest'),
+            barMaxWidth: 40
           }]
         })
       })
@@ -632,25 +637,24 @@ export default {
     ul {
       margin-top: 20px;
       li {
-        &:nth-of-type(2) {
-          border-top: 1px solid #e5e9f3;
-          border-bottom: 1px solid #e5e9f3;
-        }
-        // height:35px;
+        display:table-row;
         line-height: 35px;
-        padding:0px 25%;
         span {
+          width:30%;
           text-align: right;
-          min-width: 70px;
+          min-width: 80px;
           margin-right: 10px;
           color: #8e98a9;
+          display: table-cell;
         }
         em {
+          display: table-cell;
           color: #55627b;
-          width: 110px;
+          // width: 260px;
+          padding:0 10px;
           line-height: 15px;
           vertical-align: middle;
-          display: inline-block;
+          // display: inline-block;
           word-wrap: break-word;
           word-break: break-all;
         }
