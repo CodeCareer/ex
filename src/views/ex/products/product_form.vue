@@ -9,7 +9,7 @@
             el-form-item.el-input--xs(label="产品全称：", prop="name")
               el-input(placeholder='示例：京东丰银宝A', v-model="product.name")
             el-form-item.el-input--xs(label="销售平台：", prop="consignee_name")
-              el-autocomplete(v-model="product.consignee_name", :fetch-suggestions="querySearch", placeholder="如无意向平台，请填写「其它」或与我们联系", @select="handleSelect")
+              el-autocomplete(v-model="product.consignee_name", :fetch-suggestions="queryConsigneeSearch", placeholder="如无意向平台，请填写「其它」或与我们联系", @select="handleConsigneeSelect")
             el-form-item.el-input--xs(label="产品简称：", prop="product_short_name")
               el-input(placeholder='请输入产品简称', v-model="product.product_short_name")
             el-form-item.el-input--xs(label="产品代码：", prop="product_code")
@@ -42,9 +42,11 @@
               el-input(placeholder='募集期限=下架日期-上架日期',:disabled="true", v-model="product.allocated_sustained")
                template(slot='append') 天
             el-form-item.el-input--xs(label="结算时限：", prop="settle_deadline_minutes")
-              //- el-time-select(v-model="product.settle_deadline_minutes", placeholder="请输入结算时限", :picker-options="{start: '00:00', step: '00:30', end: '23:30'}", @change="settleDeadlineMinuteChange")
-              | {{product.settle_deadline_minutes}}
-              el-time-picker(v-model="product.settle_deadline_minutes", placeholder="请选择结算时限", :picker-options="{selectableRange: '18:30:00 - 20:30:00'}")
+              el-autocomplete(v-model="product.settle_deadline_minutes", :fetch-suggestions="querySDMinutesSearch", placeholder="请输入结算时限", @select="handleSDMinutesSelect")
+              //- el-input(placeholder='建议填写，示例：50000', v-model.number="product.allocated_amount", icon="time")
+              //- el-time-select(v-model="product.settle_deadline_minutes", placeholder="请选择结算时限", :picker-options="{start: '00:00', step: '00:01', end: '23:30'}", @change="settleDeadlineMinuteChange")
+              //- | {{product.settle_deadline_minutes}}
+              //- el-time-picker(v-model="product.settle_deadline_minutes", placeholder="请选择结算时限", :picker-options="{selectableRange: '18:30:00 - 20:30:00'}")
             el-form-item.el-input--xs(label="年化计息天数：", prop="days_of_year")
                el-select(v-model="product.days_of_year", placeholder="请选择年化计息天数")
                 el-option(v-for='item in daysOfYearOptions', :label='item.label', :value='item.value')
@@ -115,16 +117,27 @@ export default {
   },
   methods: {
     // 机构名称实时筛选
-    querySearch(queryString, cb) {
+    queryConsigneeSearch(queryString, cb) {
       var results = queryString ? this.consignees.filter(v => v.value.includes(queryString)) : this.consignees
         // 调用 callback 返回建议列表的数据
       cb(results)
     },
 
     // 选择机构后的回调
-    handleSelect(item) {
+    handleConsigneeSelect(item) {
       this.product.consignee_id = item.id
       this.reValidate(['consignee_name'])
+    },
+
+    // 结算时间实时筛选
+    querySDMinutesSearch(queryString, cb) {
+      var results = queryString ? this.sdMinutes.filter(v => v.value.includes(queryString)) : this.sdMinutes
+      cb(results)
+    },
+
+    // 选择结算时间后的回调
+    handleSDMinutesSelect(item) {
+      this.reValidate(['settle_deadline_minutes'])
     },
 
     // 重新验证哪些字段
@@ -177,6 +190,14 @@ export default {
     }
   },
 
+  watch: {
+    'product.settle_deadline_minutes' (newValue) {
+      if (moment(newValue, 'H:mm').format('H:mm') === newValue) {
+        this.product.settle_deadline_minutes = moment(newValue, 'H:mm').format('HH:mm')
+      }
+    }
+  },
+
   data() {
     var _self = this
 
@@ -201,6 +222,21 @@ export default {
         cb()
       }
     }
+
+    // 时间验证
+    let validateTime = (rule, value, cb) => {
+      if (rule.timeFormat && moment(value, rule.timeFormat).format(rule.timeFormat) !== value) {
+        cb(new Error(`请正确填写时间格式例如${moment().format(rule.timeFormat)}`))
+      }
+    }
+
+    let sdMinutes = _.flatten(_.range(24).map(vh => {
+      return _.range(4).map(vm => {
+        return {
+          value: moment(`${vh}:${vm * 15}`, 'H:mm').format('HH:mm')
+        }
+      })
+    }))
 
     return {
       valueAtOptions: {
@@ -232,6 +268,7 @@ export default {
         value: 'H'
       }],
       consignees: [],
+      sdMinutes: sdMinutes,
       product: {
         name: '', // 产品名称
         consignee_id: '', //销售平台id
@@ -320,6 +357,10 @@ export default {
           gtFieldName: '上架日期',
           ltFieldName: '起息日',
           validator: validateCompareDate
+        }],
+        settle_deadline_minutes: [{
+          validator: validateTime,
+          timeFormat: 'HH:mm'
         }],
         consignee_bank_name: [{
           min: 0,

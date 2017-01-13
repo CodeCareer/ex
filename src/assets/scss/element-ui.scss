@@ -215,6 +215,9 @@ body {
     box-shadow: none;
     margin: 0;
     li {
+      &.highlighted {
+        background-color: $primary_color;
+      }
       font-size: 13px;
       line-height: 25px;
     }
