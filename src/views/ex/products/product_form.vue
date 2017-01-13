@@ -15,36 +15,40 @@
             el-form-item.el-input--xs(label="产品代码：", prop="product_code")
               el-input(placeholder='请输入产品代码', v-model="product.product_code")
             el-form-item.el-input--xs(label="发行利率：", prop="annual_rate")
-              el-input(placeholder='建议填写', v-model="product.annual_rate")
+              el-input(placeholder='建议填写', v-model.number="product.annual_rate")
                template(slot='append') %
             el-form-item.el-input--xs(label="起息日：", prop="value_at")
-              el-date-picker(v-model="product.value_at", type="date", placeholder="建议填写", :picker-options="valueAtOptions")
+              el-date-picker(v-model="product.value_at", type="date", placeholder="建议填写", :picker-options="valueAtOptions", @change="calculateSustained")
             el-form-item.el-input--xs(label="到期日：", prop="due_at")
-              el-date-picker(v-model="product.due_at", type="date", placeholder="建议填写", :picker-options="valueAtOptions")
+              el-date-picker(v-model="product.due_at", type="date", placeholder="建议填写", :picker-options="valueAtOptions", @change="calculateSustained")
             el-form-item.el-input--xs(label="发行期限：", prop="sustained")
-              el-input(placeholder='发行期限=到期日-起息日',:disabled="true", v-model="product.sustained")
+              el-input(placeholder='发行期限=到期日-起息日',:disabled="true", v-model.number="product.sustained")
                template(slot='append') 天
           .right
             el-form-item.el-input--xs(label="计划募集金额：", prop="allocated_amount")
-              el-input(placeholder='建议填写', v-model="product.allocated_amount")
+              el-input(placeholder='建议填写，示例：50000', v-model.number="product.allocated_amount")
+                template(slot='append') 元
             el-form-item.el-input--xs(label="实际募集金额：", prop="subscription_amount")
-              el-input(placeholder='建议填写', v-model="product.subscription_amount")
-            el-form-item.el-input--xs(label="实际募集金额：", prop="subscription_amount")
+              el-input(placeholder='该字段填写后不可修改。示例：50000', v-model.number="product.subscription_amount")
+                template(slot='append') 元
+            el-form-item.el-input--xs(label="产品风险评级：", prop="subscription_amount")
               el-select(v-model="product.risk_level", placeholder="请选择风险等级")
                 el-option(v-for='item in riskLevelOptions', :label='item.label', :value='item.value')
             el-form-item.el-input--xs(label="上架日期：", prop="published_start_at")
-              el-date-picker(v-model="product.published_start_at", type="date", placeholder="请选择上架日期", :picker-options="valueAtOptions")
+              el-date-picker(v-model="product.published_start_at", type="date", placeholder="请选择上架日期", :picker-options="valueAtOptions", @change="calculateAllocatedSustained")
             el-form-item.el-input--xs(label="下架日期：", prop="published_end_at")
-              el-date-picker(v-model="product.published_end_at", type="date", placeholder="请选择上架日期", :picker-options="valueAtOptions")
+              el-date-picker(v-model="product.published_end_at", type="date", placeholder="请选择上架日期", :picker-options="valueAtOptions", @change="calculateAllocatedSustained")
             el-form-item.el-input--xs(label="募集期限：", prop="allocated_sustained")
               el-input(placeholder='募集期限=下架日期-上架日期',:disabled="true", v-model="product.allocated_sustained")
                template(slot='append') 天
             el-form-item.el-input--xs(label="结算时限：", prop="settle_deadline_minutes")
+              //- el-time-select(v-model="product.settle_deadline_minutes", placeholder="请输入结算时限", :picker-options="{start: '00:00', step: '00:30', end: '23:30'}", @change="settleDeadlineMinuteChange")
+              | {{product.settle_deadline_minutes}}
               el-time-picker(v-model="product.settle_deadline_minutes", placeholder="请选择结算时限", :picker-options="{selectableRange: '18:30:00 - 20:30:00'}")
             el-form-item.el-input--xs(label="年化计息天数：", prop="days_of_year")
                el-select(v-model="product.days_of_year", placeholder="请选择年化计息天数")
                 el-option(v-for='item in daysOfYearOptions', :label='item.label', :value='item.value')
-        .panel-body-title 基本信息
+        .panel-body-title 发行方募集账户
         .form-block.clfix
           .left
             el-form-item.el-input--xs(label="账户名：", prop="consignee_bank_account_name")
@@ -64,12 +68,16 @@ import {
   FormItem,
   DatePicker,
   TimePicker,
+  TimeSelect,
   Autocomplete,
+  MessageBox,
   Select,
   Option,
   Input,
   Button
 } from 'element-ui'
+import moment from 'moment'
+import _ from 'lodash'
 
 export default {
   components: {
@@ -80,6 +88,7 @@ export default {
     ElOption: Option,
     ElDatePicker: DatePicker,
     ElTimePicker: TimePicker,
+    ElTimeSelect: TimeSelect,
     ElAutocomplete: Autocomplete,
     ElButton: Button
   },
@@ -99,6 +108,9 @@ export default {
     }, {
       value: '机构5',
       id: '5'
+    }, {
+      value: '其它',
+      id: 'other'
     }]
   },
   methods: {
@@ -109,8 +121,39 @@ export default {
       cb(results)
     },
 
+    // 选择机构后的回调
     handleSelect(item) {
       this.product.consignee_id = item.id
+      this.reValidate(['consignee_name'])
+    },
+
+    // 重新验证哪些字段
+    reValidate(fields) {
+      _.map(fields, v => {
+        this.$refs.productForm.validateField(v)
+      })
+    },
+
+    // 计算发行期限
+    calculateSustained() {
+      if (this.product.value_at && this.product.due_at) {
+        this.reValidate(['value_at', 'due_at', 'published_start_at'])
+        this.product.sustained = moment(this.product.due_at).diff(moment(this.product.value_at), 'days')
+      }
+    },
+
+    // 计算募集期限
+    calculateAllocatedSustained() {
+      if (this.product.published_start_at && this.product.published_end_at) {
+        this.reValidate(['value_at', 'published_start_at', 'published_end_at'])
+        this.product.allocated_sustained = moment(this.product.published_end_at).diff(moment(this.product.published_start_at), 'days')
+      }
+    },
+
+    // 结算时限
+    settleDeadlineMinuteChange(value) {
+      this.product.settle_deadline_minutes = value
+      console.log(value)
     },
 
     submitForm() {
@@ -121,24 +164,58 @@ export default {
           // })
         }
       })
+    },
+
+    cancelForm() {
+      MessageBox.confirm('确认离开吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$router.back()
+      })
     }
   },
 
   data() {
+    var _self = this
+
+    // 机构名称校验
+    let validateConsignee = (rule, value, cb) => {
+      if (value === '') {
+        cb(new Error('请填写机构'))
+      } else if (!this.consignees.some(v => v.value === value)) {
+        cb(new Error('请按提示选择相应机构'))
+      } else {
+        cb()
+      }
+    }
+
+    // 日期验证
+    let validateCompareDate = (rule, value, cb) => {
+      if (rule.lt && moment(value).toDate() >= moment(_.get(_self, rule.lt)).toDate()) {
+        cb(new Error(`要求小于${rule.ltFieldName}`))
+      } else if (rule.gt && moment(value).toDate() <= moment(_.get(_self, rule.gt)).toDate()) {
+        cb(new Error(`要求大于${rule.gtFieldName}`))
+      } else {
+        cb()
+      }
+    }
+
     return {
       valueAtOptions: {
-        disabledDate(time) {
+        /*disabledDate(time) {
           return time.getTime() < Date.now() - 8.64e7
-        }
+        }*/
       },
-      daysOfYearOptions: [{
+      daysOfYearOptions: [{ // 年化计息天数
         label: '360 天',
         value: 1
       }, {
         label: '365 天',
         value: 2
       }],
-      riskLevelOptions: [{
+      riskLevelOptions: [{ // 风险等级
         label: '低',
         value: 'L'
       }, {
@@ -177,7 +254,7 @@ export default {
         consignee_bank_account: '', //平台银行账户
         consignee_bank_account_name: '' //平台银行账户名称
       },
-      rules: {
+      rules: { // 校验规则
         name: [{
           required: true,
           message: '请填写产品全称',
@@ -185,8 +262,79 @@ export default {
         }, {
           min: 1,
           max: 50,
-          message: '文本，字数不得超过50。',
+          message: '文本，字数不得超过50',
           trigger: 'blur'
+        }],
+        consignee_name: [{
+          required: true,
+          message: '如无意向平台，请填写「其它」或与我们联系',
+          trigger: 'blur'
+        }, {
+          validator: validateConsignee,
+          trigger: 'blur'
+        }],
+        product_short_name: [{
+          min: 0,
+          max: 50,
+          message: '文本，字数不得超过50'
+        }],
+        product_code: [{
+          min: 0,
+          max: 50,
+          message: '文本，字数不得超过50'
+        }],
+        annual_rate: [{
+          type: 'number',
+          message: '请正确输入利率'
+        }],
+        value_at: [{
+          gt: 'product.published_start_at',
+          lt: 'product.due_at',
+          ltFieldName: '到期日',
+          gtFieldName: '上架日期',
+          validator: validateCompareDate
+        }],
+        due_at: [{
+          gt: 'product.value_at',
+          gtFieldName: '起息日',
+          validator: validateCompareDate
+        }],
+        allocated_amount: [{
+          type: 'integer',
+          message: '请输入正整数',
+          min: 0
+        }],
+        subscription_amount: [{
+          type: 'integer',
+          message: '请输入正整数',
+          min: 0
+        }],
+        published_start_at: [{
+          lt: 'product.published_end_at',
+          ltFieldName: '下架日期',
+          validator: validateCompareDate
+        }],
+        published_end_at: [{
+          gt: 'product.published_start_at',
+          lt: 'product.value_at',
+          gtFieldName: '上架日期',
+          ltFieldName: '起息日',
+          validator: validateCompareDate
+        }],
+        consignee_bank_name: [{
+          min: 0,
+          max: 50,
+          message: '文本，字数不得超过50'
+        }],
+        consignee_bank_account: [{
+          min: 0,
+          max: 50,
+          message: '文本，字数不得超过50'
+        }],
+        consignee_bank_account_name: [{
+          min: 0,
+          max: 50,
+          message: '文本，字数不得超过50'
         }]
       }
     }

@@ -110,6 +110,7 @@ body {
     border-color: $primary_color;
   }
   .el-select {
+    width: 100%;
     .el-input__inner:focus {
       border-color: $primary_color;
     }
@@ -123,6 +124,11 @@ body {
   }
   .el-select-dropdown__list {
     padding: 3px 0;
+  }
+  .el-select-dropdown {
+    border-color: $border_color;
+    box-shadow: none;
+    margin: 0;
   }
   .el-select-dropdown__item {
     font-size: 13px;
@@ -153,8 +159,27 @@ body {
     // height: 25px;
     // line-height: 25px;
   }
+  .el-picker-panel {
+    margin: 0;
+    border-color: $border_color;
+    box-shadow: none;
+  }
+  .el-date-picker__header-label.active,
+  .el-date-picker__header-label:hover,
+  .el-picker-panel__icon-btn:hover {
+    color: $primary_color;
+  }
+  .el-month-table,
+  .el-year-table {
+    td.current .cell {
+      background-color: $primary_color!important;
+    }
+  }
   .el-date-table {
     tbody {
+      tr {
+        border-bottom: none;
+      }
       td {
         padding: 5px 0px;
         width: auto;
@@ -171,6 +196,29 @@ body {
       background-color: $primary_color!important;
     }
   }
+  .time-select .el-picker-panel__content {
+    overflow-y: scroll;
+  }
+  .time-select-item {
+    line-height: 25px;
+    padding: 0 10px;
+    &.selected:not(.disabled) {
+      background-color: $primary_color;
+      &:hover {
+        background-color: $primary_color;
+      }
+    }
+  }
+  .el-autocomplete__suggestions {
+    padding: 3px 0;
+    border-color: $border_color;
+    box-shadow: none;
+    margin: 0;
+    li {
+      font-size: 13px;
+      line-height: 25px;
+    }
+  }
   .el-input--xs {
     font-size: 13px;
     .el-form-item__content {
@@ -180,6 +228,7 @@ body {
       }
     }
     .el-input__inner {
+      font-size: 13px;
       height: 25px;
       &::-moz-placeholder {
         font-size: 13px;
@@ -189,14 +238,6 @@ body {
       }
       &::-webkit-input-placeholder {
         font-size: 13px;
-      }
-    }
-    .el-autocomplete__suggestions {
-      padding: 3px 0;
-      border-color: $border_color;
-      li {
-        font-size: 13px;
-        line-height: 25px;
       }
     }
   }
@@ -223,6 +264,7 @@ body {
   .el-autocomplete__suggestions {
     li {
       font-size: 13px;
+      line-height: 25px;
     }
     li:active {
       color: white;
@@ -233,7 +275,7 @@ body {
     font-size: 13px;
     padding: 5px 15px;
   }
-  .el-button--minor{
+  .el-button--minor {
     background-color: $minor_color;
     border-color: $minor_color;
     color: white;

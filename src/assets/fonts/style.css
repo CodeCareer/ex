@@ -29,15 +29,15 @@
   content: "\e90c";
 }
 
-.icon-selectDown:before {
+.icon-select-down:before {
   content: "\e907";
 }
 
-.icon-scorDown:before {
+.icon-arrow-down:before {
   content: "\e908";
 }
 
-.icon-scorTop:before {
+.icon-arrow-top:before {
   content: "\e909";
 }
 
