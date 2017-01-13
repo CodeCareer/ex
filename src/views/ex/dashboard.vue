@@ -98,17 +98,37 @@
               td
                 span(v-show="product.update_status === '已更新' ? true : false") 更新时间:
                   em {{product.updated_at}}
+    .today-square
+      h2 趋势图
+      .trend-chart
+        .trend-product.fl
+          h3 存量产品金额波动趋势
+          .crumbs
+            ul
+              li(v-for="stocktrend in stocktrends", @click="goTrend(stocktrend)" ,:class="{active:stocktrend == stockName}") {{stocktrend}}
+          .trend-chart
+            kt-bar-chart(:chart-option="stockChartOption")
+        .trend-stock.fr
+          h3 交易所近期资金流动趋势
+          .capital-chart
+            kt-line-chart(:chart-option="lineChartOption")
 </template>
 
 <script>
 import _ from 'lodash'
+import Vue from 'vue'
+import moment from 'moment'
 import {
   subsist,
   stock,
   liquidation,
-  updatedProducts
+  updatedProducts,
+  stockTrend,
+  capitalTrend
 } from '../../common/resources.js'
 import KtPieEchart from '../../components/kt-pie-echart.vue'
+import ktBarChart from '../../components/kt-bar-echart.vue'
+import ktLineChart from '../../components/kt-line-echart.vue'
 import {
   Tooltip,
   Loading
@@ -117,6 +137,8 @@ import exMixin from './mixin.js'
 export default {
   mixins: [exMixin],
   components: {
+    ktLineChart,
+    ktBarChart,
     KtPieEchart,
     ElTooltip: Tooltip
   },
@@ -182,7 +204,139 @@ export default {
         })
       })
     },
+    //查找各平台的chart
+    goTrend(platform) {
+      this.collectivityChart(this.balanceTrends.find(v => v.consignee === platform).data)
+      this.stockName = platform
+    },
+    //总体数据图表
+    collectivityChart(data) {
+      this.stockChartOption = _.merge({}, this.stockChartOption, {
+        xAxis: {
+          data: _.map(data, v => moment(v.date).format('MM.DD'))
+        },
+        series: [{
+          name: '存续本金',
+          type: 'bar',
+          stack: '广告',
+          data: _.map(data, 'principal'),
+          barMaxWidth: 40
+        }, {
+          name: '存续利息',
+          type: 'bar',
+          stack: '广告',
+          data: _.map(data, 'interest'),
+          barMaxWidth: 40
+        }]
+      })
+    },
+    //存量产品金额波动趋势
+    stockTrendGet() {
+      return stockTrend.get().then(res => res.json()).then(data => {
+        this.balanceTrends = data.balance_trends.by_consignee
+        this.stocktrends = _.map(this.balanceTrends, 'consignee')
+        this.goTrend('总体')
+        this.stockName = '总体'
+      })
+    },
+    //近期资金流动趋势
+    capitalTrendGet() {
+      return capitalTrend.get().then(res => res.json()).then(data => {
+        debugger
+        this.lineChartOption = _.merge({}, this.lineChartOption, {
+          legend: {
+            data: ['申购', '到期', '赎回', '发行', '现金流'],
+            itemGap: 20,
+            textStyle: {
+              color: '#000',
+              fontSize: 12
+            }
+          },
+          xAxis: [{
+            type: 'category',
+            data: _.map(data.fund_trends, v => moment(v.date).format('MM-DD')),
+            // axisLabel: {
+            //   interval: 0,
+            //   textStyle: {
+            //     fontSize: 12,
+            //     color: '#000'
+            //   }
+            // },
+            // axisTick: {
+            //   show: false
+            // }
+            splitLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            }
+          }],
+          yAxis: [{
+            type: 'value',
+            name: '',
 
+            interval: 0,
+            axisLabel: {
+              show: true,
+              formatter: '{value}'
+            },
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: '#000'
+              }
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          }],
+          series: [{
+            name: '申购',
+            type: 'line',
+            barWidth: 50,
+            barGap: 50,
+            data: _.map(data.fund_trends, v => v.subscription),
+            color: ['#424853']
+          }, {
+            name: '到期',
+            type: 'line',
+            //yAxisIndex: 1,
+            data: _.map(data.fund_trends, v => v.settlement),
+            color: ['#19b8bc'],
+            symbolSize: 10,
+            symbol: 'circle'
+          }, {
+            name: '赎回',
+            type: 'line',
+            //yAxisIndex: 1,
+            data: _.map(data.fund_trends, v => v.redeemed),
+            color: ['#41a5d7'],
+            symbolSize: 10,
+            symbol: 'circle'
+          }, {
+            name: '发行',
+            type: 'line',
+            //yAxisIndex: 1,
+            data: _.map(data.fund_trends, v => v.issurance),
+            color: ['#ad74d5'],
+            symbolSize: 10,
+            symbol: 'circle'
+          }, {
+            name: '现金流',
+            type: 'bar',
+            //yAxisIndex: 1,
+            data: _.map(data.fund_trends, v => v.net_cash_flow),
+            color: ['#d1d2d4'],
+            symbolSize: 10,
+            symbol: 'circle'
+          }]
+        })
+      })
+    },
     // 今日清算
     liquidationGet() {
       return liquidation.get().then(res => res.json()).then(data => {
@@ -209,7 +363,9 @@ export default {
       this.subsistGet(),
       this.stockGet(),
       this.liquidationGet(),
-      this.updatedProductsGet()
+      this.updatedProductsGet(),
+      this.stockTrendGet(),
+      this.capitalTrendGet()
     ]).then(() => {
       this.instLoading.close()
     }).catch(res => {
@@ -221,10 +377,42 @@ export default {
     return {
       balance: '',
       pieChartOption: {},
+      lineChartOption: {},
       summary: '',
       virtualAssets: '',
       updateSummary: '',
-      updateVas: ''
+      updateVas: '',
+      stocktrends: '',
+      stockName: '',
+      stockChartOption: {
+        tooltip: {
+          formatter: (params, ticket, callback) => {
+            if (!params.length) return
+            return _.concat([`<div>${params[0].name}`], params.map(v => {
+              return `<p>${v.seriesName}:${Vue.filter('ktCurrency')(v.value)}</p>`
+            }), '</div>').join('')
+          }
+        },
+        legend: {
+          data: [{
+            name: '存续本金',
+            icon: 'circle' //示例图标设为圆形
+          }, {
+            name: '存续利息',
+            icon: 'circle'
+          }]
+        },
+        xAxis: {
+          type: 'category',
+          // data: _.map(data, v => moment(v.date).format('MM.DD')),
+          splitLine: {
+            show: false
+          },
+          axisTick: {
+            show: false
+          }
+        }
+      }
     }
   }
 }
@@ -347,7 +535,7 @@ export default {
 }
 
 .today-square {
-  margin-top: 25px;
+  margin-top: 20px;
   h2 {
     i {
       font-size: 15px;
@@ -369,5 +557,63 @@ export default {
 .overview-table {
   max-height: 500px;
   overflow-y: scroll;
+}
+
+//趋势图
+.trend-chart {
+  overflow: hidden;
+  .trend-product,
+  .trend-stock {
+    background: #fff;
+    border-radius: 4px;
+    padding: 10px;
+    width: 49.5%;
+    height: 400px;
+    h3 {
+      height: 40px;
+      width: 100%;
+      line-height: 40px;
+      color: #55627b;
+      font-size: 15px;
+      background: #ecf1f7;
+      padding: 0 15px;
+      border-radius: 4px 4px 0 0;
+    }
+  }
+  .crumbs {
+    overflow-x: auto;
+    width: 100%;
+    ul {
+      width: 100000px;
+    }
+    li {
+      list-style: none;
+      display: inline-block;
+      padding: 10px 10px;
+      font-size: 14px;
+      color: #55627b;
+      cursor: pointer;
+      &:before{
+        content:'';
+        width:8px;
+        height:8px;
+        background: #333;
+        border-radius: 100%;
+
+      }
+      &.active {
+        color: #35cec3;
+      }
+    }
+  }
+  .trend-chart {
+    width: 100%;
+    height: 300px;
+  }
+  .capital-chart {
+    width: 100%;
+    padding:10px 0;
+    height: 350px;
+  }
 }
 </style>

@@ -41,7 +41,7 @@ export default {
       },
       grid: {
         show: false,
-        left: '100px',
+        left: '90px',
         right: '0',
         bottom: '60px'
       },
@@ -64,7 +64,8 @@ export default {
         fontFamily: 'Helvetica,microsoft yahei,Arial,Verdana,sans-serif'
       }
     }
-    this.barChart.setOption(_.extend({}, option, this.chartOption))
+
+    this.barChart.setOption(_.merge({}, option, this.chartOption))
   },
 
   watch: {
@@ -77,7 +78,7 @@ export default {
 
 <style lang="scss">
 .bar-echart {
-  min-width: 550px;
+  min-width: 500px;
   height: 100%;
   margin: 0 auto;
 }

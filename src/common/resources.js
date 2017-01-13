@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 let sessions, accounts, products, registerProducts, subsist, stock, liquidation,
   essentialInformation, productLiquidation, update, productExecute, productStock,
-  registeredProducts, investor, fees, updatedProducts
+  registeredProducts, investor, fees, updatedProducts, stockTrend, capitalTrend
 
 let previousRequestMap = {}
 let commonOpts = {
@@ -34,6 +34,8 @@ export default function setResources(resource) {
   registeredProducts = resource('virtual_assets{/virtual_asset_id}/registered_products', {}, {}, commonOpts) //单个产品下的存量登记产品列表
   investor = resource('registered_products{/registered_product_id}/investors', {}, {}, commonOpts) //单个登记产品下的客户
   fees = resource('virtual_assets{/virtual_asset_id}/fees', {}, {}, commonOpts) //单个产品的费用详情
+  stockTrend = resource('statistics/balance/trends', {}, {}, commonOpts) //存量产品金额波动趋势
+  capitalTrend = resource('statistics/fund/trends', {}, {}, commonOpts) //近期资金流动趋势
 }
 
 export {
@@ -52,5 +54,7 @@ export {
   productStock,
   registeredProducts,
   investor,
-  fees
+  fees,
+  stockTrend,
+  capitalTrend
 }
