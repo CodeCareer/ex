@@ -25,7 +25,7 @@
           tbody
             tr(v-if="investorsDialog.investors.length", v-for="investor in investorsDialog.investors")
               td {{investor.name}}
-              td {{investor.price}}
+              td {{investor.price | ktRound(2)}}
               td {{investor.percentage | ktPercent}}
             tr(v-if="!investorsDialog.investors.length")
               td(colspan="3") 无客户信息
@@ -53,100 +53,6 @@ export default {
       this.investorsDialog.title = product.product_code
       this.investorsDialog.show = true
       this.investorsDialog.investors = data.investors
-
-      /*this.investorsDialog.investors = [{
-        name: '客户1',
-        price: 100000,
-        percentage: 0.01
-      }, {
-        name: '客户2',
-        price: 200000,
-        percentage: 0.02
-      }, {
-        name: '客户3',
-        price: 300000,
-        percentage: 0.03
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户4',
-        price: 400000,
-        percentage: 0.04
-      }, {
-        name: '客户5',
-        price: 500000,
-        percentage: 0.05
-      }]*/
     }
   },
 

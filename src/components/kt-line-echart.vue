@@ -12,32 +12,87 @@ require('echarts/lib/component/legend')
 require('echarts/lib/component/grid')
 require('echarts/lib/component/axis')
 import _ from 'lodash'
+import Vue from 'vue'
 
 export default {
   props: ['chartOption'],
   data() {
     return {
-      barChart: null
+      echart: null
     }
   },
 
   mounted() {
-    this.barChart = echarts.init(this.$refs.lineEchart)
+    this.echart = echarts.init(this.$refs.lineEchart)
     var option = {
+      legend: {
+        itemGap: 20,
+        textStyle: {
+          color: '#262c38',
+          fontSize: 12
+        }
+      },
       tooltip: {
-        trigger: 'axis'
+        trigger: 'axis',
+        formatter: (params, ticket, callback) => {
+          if (!params.length) return
+          return _.concat([`<table class="chart-tooltip"><tr><th colspan="2">${params[0].name}</th><tr>`],
+            params.map(v => {
+              return `<tr class="line">
+                        <td class="left"><i class="circle" style="color:${v.color}"></i>${v.seriesName}：</td>
+                        <td class="right">${Vue.filter('ktCurrency')(v.value)}</td>
+                      </tr>`
+            }), '</table>').join('')
+        }
+      },
+      xAxis: {
+        type: 'category',
+        // data: _.map(data.fund_trends, v => moment(v.date).format('MM-DD')),
+        splitLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: '',
+        interval: 0,
+        axisLabel: {
+          show: true,
+          formatter: '{value}'
+        },
+        axisLine: {
+          show: true,
+          lineStyle: {
+            color: '#000'
+          }
+        },
+        axisTick: {
+          show: false
+        },
+        splitLine: {
+          show: false
+        }
       },
       grid: {
-        left: 100
+        show: false,
+        left: 100,
+        right: 20,
+        bottom: 60
       }
     }
 
-    this.barChart.setOption(_.merge({}, option, this.chartOption))
+    this.echart.setOption(_.merge({}, option, this.chartOption))
+    window.addEventListener('resize', () => {
+      this.echart.resize()
+    })
   },
 
   watch: {
     chartOption() {
-      this.barChart.setOption(this.chartOption)
+      this.echart.setOption(this.chartOption)
     }
   }
 }

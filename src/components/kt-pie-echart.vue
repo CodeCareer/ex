@@ -15,18 +15,20 @@ export default {
   props: ['chartOption'],
   data() {
     return {
-      chart: null
+      echart: null
     }
   },
 
   mounted() {
-    this.chart = echart.init(this.$refs.echart)
+    this.echart = echart.init(this.$refs.echart)
     let option = {
       tooltip: {
         show: true,
         trigger: 'item',
         formatter: (params, ticket, callback) => {
-          return '<div style="text-align:center; font-size:14px;">' + params.name + '<br/>' + Vue.filter('ktCurrency')(params.value) + '(' + params.percent + '%)' + '</div>'
+          return `<div class="chart-tooltip" style="text-align:center; font-size:14px;">
+                  <i class="circle" style="color:${params.color}"></i>${params.name}<br/>
+                  ${Vue.filter('ktCurrency')(params.value)}(${params.percent}%)</div>`
         }
       },
       color: ['#21a9e1', '#35cbef', '#1fdab1', '#92e68d'],
@@ -38,7 +40,7 @@ export default {
         // data: this.chartOption.legendData,
         data: [],
         textStyle: {
-          fontSize: 14, //示例文字size
+          fontSize: 12, //示例文字size
           color: '#262c38' //示例文字颜色
         },
         itemWidth: 16,
@@ -73,12 +75,15 @@ export default {
       }]
     }
 
-    this.chart.setOption(_.merge({}, option, this.chartOption))
+    this.echart.setOption(_.merge({}, option, this.chartOption))
+    window.addEventListener('resize', () => {
+      this.echart.resize()
+    })
   },
 
   watch: {
     chartOption() {
-      this.chart.setOption(this.chartOption)
+      this.echart.setOption(this.chartOption)
     }
   }
 }

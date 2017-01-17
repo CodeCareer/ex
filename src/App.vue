@@ -10,6 +10,7 @@
 @import './assets/scss/layout.scss';
 @import './assets/scss/form.scss';
 @import './assets/scss/table.scss';
+@import './assets/scss/chart.scss';
 @import './assets/scss/panel.scss';
 @import './assets/scss/animation.scss';
 @import './assets/scss/transition.scss';

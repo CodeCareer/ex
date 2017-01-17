@@ -11,43 +11,54 @@ require('echarts/lib/component/legend')
 require('echarts/lib/component/grid')
 require('echarts/lib/component/axis')
 import _ from 'lodash'
+import Vue from 'vue'
 
 export default {
   props: ['chartOption'],
   data() {
     return {
-      barChart: null
+      echart: null
     }
   },
 
   mounted() {
-    this.barChart = echarts.init(this.$refs.chart)
+    this.echart = echarts.init(this.$refs.chart)
     var option = {
       tooltip: {
-        trigger: 'axis'
+        trigger: 'axis',
+        formatter: (params, ticket, callback) => {
+          if (!params.length) return
+          return _.concat([`<table class="chart-tooltip"><tr><th colspan="2">${params[0].name}</th><tr>`],
+            params.map(v => {
+              return `<tr class="line">
+                        <td class="left"><i class="circle" style="color:${v.color}"></i>${v.seriesName}：</td>
+                        <td class="right">${Vue.filter('ktCurrency')(v.value)}</td>
+                      </tr>`
+            }), '</table>').join('')
+        }
       },
       legend: {
         orient: 'horizontal',
         // x: '20px',
         // left: '0px',
         // y: '280px',
-        bottom: '0px',
+        bottom: 20,
         data: [],
         itemwidth: 10, //示例图标宽度
         textStyle: {
-          fontSize: 13, //示例文字size
-          color: '#616a7b' //示例文字颜色
+          fontSize: 12, //示例文字size
+          color: '#262c38' //示例文字颜色
         }
       },
       grid: {
         show: false,
-        left: '90px',
-        right: '0',
-        bottom: '60px'
+        left: 100,
+        right: 20,
+        bottom: 80
       },
       xAxis: {
         type: 'category',
-        data: [] //this.barChart.dateArr
+        data: [] //this.echart.dateArr
       },
       yAxis: {
         type: 'value',
@@ -65,12 +76,16 @@ export default {
       }
     }
 
-    this.barChart.setOption(_.merge({}, option, this.chartOption))
+    this.echart.setOption(_.merge({}, option, this.chartOption))
+
+    window.addEventListener('resize', () => {
+      this.echart.resize()
+    })
   },
 
   watch: {
     chartOption() {
-      this.barChart.setOption(this.chartOption)
+      this.echart.setOption(this.chartOption)
     }
   }
 }

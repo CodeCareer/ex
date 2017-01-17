@@ -195,7 +195,6 @@
 
 <script>
 import exMixin from './mixin.js'
-import Vue from 'vue'
 import {
   MessageBox,
   Message,
@@ -306,14 +305,6 @@ export default {
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.stockChartOption = _.merge({}, this.stockChartOption, {
-          tooltip: {
-            formatter: (params, ticket, callback) => {
-              if (!params.length) return
-              return _.concat([`<div>${params[0].name}`], params.map(v => {
-                return `<p>${v.seriesName}:${Vue.filter('ktCurrency')(v.value)}</p>`
-              }), '</div>').join('')
-            }
-          },
           legend: {
             data: [{
               name: '存续本金',

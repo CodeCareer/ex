@@ -131,6 +131,7 @@ export default {
       }])
 
       this.product = data.virtual_asset
+      this.product.annual_rate *= 100
       this.product.consignee_name = _.get(_.find(this.consignees, c => c.id === data.virtual_asset.consignee_id), 'value')
     } else {
       setTimeout(() => {

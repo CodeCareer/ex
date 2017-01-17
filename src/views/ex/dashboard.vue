@@ -34,31 +34,35 @@
           span {{summary.expired}}
           em 条 已过期
       .overview-table
-        table(v-for="(item,key) in virtualAssets")
-          thead
-            tr
-              th {{key}}
-          tbody(v-for="product in item")
-            tr(@click="toDetails(product)")
-              td(:title="product.name")
-                span {{product.name}}
-              td(:title="product.inflow | ktCurrency")
-                span(v-if="product.inflow_desc") {{product.inflow_desc}}
-                  em.red-color {{product.inflow | ktCurrency}}
-              td(:title="product.outflow | ktCurrency")
-                span(v-if="product.outflow_desc") {{product.outflow_desc}}
-                  em.green-color {{product.outflow | ktCurrency}}
-              td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
-                span {{product.net_cash_flow >= 0 ? '净流入' : '净流出'}}
-                  em(:class="[product.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
-              td
-                span.bg-color {{product.execute_method}}
-              td.implement.status-column
-                i.icon-icomoon(:class="product.execute_status | excuteStatusIcon")
-                em.em-implement {{product.execute_status}}
-              td
-                span(v-show="product.execute_status === '待执行' ? true : false") 结算时限:
-                  em {{product.due_at}}
+        .table-container(v-for="(item,key) in virtualAssets")
+          table
+            thead
+              tr
+                th {{key}}
+                th
+          .table-body
+            table
+              tbody(v-for="product in item")
+                tr(@click="toDetails(product)")
+                  td(:title="product.name")
+                    span {{product.name}}
+                  td(:title="product.inflow | ktCurrency")
+                    span(v-if="product.inflow_desc") {{product.inflow_desc}}
+                      em.red-color {{product.inflow | ktCurrency}}
+                  td(:title="product.outflow | ktCurrency")
+                    span(v-if="product.outflow_desc") {{product.outflow_desc}}
+                      em.green-color {{product.outflow | ktCurrency}}
+                  td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
+                    span {{product.net_cash_flow >= 0 ? '净流入' : '净流出'}}
+                      em(:class="[product.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
+                  td
+                    span.bg-color {{product.execute_method}}
+                  td.implement.status-column
+                    i.icon-icomoon(:class="product.execute_status | excuteStatusIcon")
+                    em.em-implement {{product.execute_status}}
+                  td
+                    span(v-show="product.execute_status === '待执行' ? true : false") 结算时限:
+                      em {{product.due_at}}
     .today-square
       h2 今日更新
         el-tooltip(effect="dark",placement="right")
@@ -74,30 +78,34 @@
           span {{updateSummary.abnormal}}
           em 条 异常
       .overview-table
-        table(v-for="(item,key) in updateVas")
-          thead
-            tr
-              th {{key}}
-          tbody(v-for="product in item")
-            tr(@click="toDetails(product)")
-              td(:title="product.name")
-                span {{product.name}}
-              td(:title="product.inflow | ktCurrency")
-                span(v-if="product.inflow_desc") {{product.inflow_desc}}
-                  em.red-color {{product.inflow | ktCurrency}}
-              td(:title="product.outflow | ktCurrency")
-                span(v-if="product.outflow_desc") {{product.outflow_desc}}
-                  em.green-color {{product.outflow | ktCurrency}}
-              td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
-                span {{product.net_cash_flow >= 0 ? '净流入' : '净流出'}}
-                  em(:class="[product.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
-              td
-              td.implement.status-column
-                i.icon-icomoon(:class="product.update_status | updateStatusIcon")
-                em.em-implement {{product.update_status}}
-              td
-                span(v-show="product.update_status === '已更新' ? true : false") 更新时间:
-                  em {{product.updated_at}}
+        .table-container(v-for="(item,key) in updateVas")
+          table
+            thead
+              tr
+                th {{key}}
+                th
+          .table-body
+            table
+              tbody(v-for="product in item")
+                tr(@click="toDetails(product)")
+                  td(:title="product.name")
+                    span {{product.name}}
+                  td(:title="product.inflow | ktCurrency")
+                    span(v-if="product.inflow_desc") {{product.inflow_desc}}
+                      em.red-color {{product.inflow | ktCurrency}}
+                  td(:title="product.outflow | ktCurrency")
+                    span(v-if="product.outflow_desc") {{product.outflow_desc}}
+                      em.green-color {{product.outflow | ktCurrency}}
+                  td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
+                    span {{product.net_cash_flow >= 0 ? '净流入' : '净流出'}}
+                      em(:class="[product.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
+                  td
+                  td.implement.status-column
+                    i.icon-icomoon(:class="product.update_status | updateStatusIcon")
+                    em.em-implement {{product.update_status}}
+                  td
+                    span(v-show="product.update_status === '已更新' ? true : false") 更新时间:
+                      em {{product.updated_at}}
     .today-square
       h2 趋势图
       .trend-chart
@@ -116,7 +124,6 @@
 
 <script>
 import _ from 'lodash'
-import Vue from 'vue'
 import moment from 'moment'
 import {
   subsist,
@@ -209,9 +216,9 @@ export default {
       this.collectivityChart(this.balanceTrends.find(v => v.consignee === platform).data)
       this.stockName = platform
     },
-    //总体数据图表
+    // 存量产品金额波动趋势
     collectivityChart(data) {
-      this.stockChartOption = _.merge({}, this.stockChartOption, {
+      this.stockChartOption = _.mergeWith({}, this.stockChartOption, {
         xAxis: {
           data: _.map(data, v => moment(v.date).format('MM.DD'))
         },
@@ -228,6 +235,10 @@ export default {
           data: _.map(data, 'interest'),
           barMaxWidth: 40
         }]
+      }, (oldOpt, newOpt) => {
+        if (_.isArray(newOpt)) {
+          return newOpt
+        }
       })
     },
     //存量产品金额波动趋势
@@ -244,55 +255,11 @@ export default {
       return capitalTrend.get().then(res => res.json()).then(data => {
         this.lineChartOption = _.merge({}, this.lineChartOption, {
           legend: {
-            data: ['申购', '到期', '赎回', '发行', '现金流'],
-            itemGap: 20,
-            textStyle: {
-              color: '#000',
-              fontSize: 12
-            }
+            data: ['申购', '到期', '赎回', '发行', '净现金流']
           },
-          xAxis: [{
-            type: 'category',
-            data: _.map(data.fund_trends, v => moment(v.date).format('MM-DD')),
-            // axisLabel: {
-            //   interval: 0,
-            //   textStyle: {
-            //     fontSize: 12,
-            //     color: '#000'
-            //   }
-            // },
-            // axisTick: {
-            //   show: false
-            // }
-            splitLine: {
-              show: false
-            },
-            axisTick: {
-              show: false
-            }
-          }],
-          yAxis: [{
-            type: 'value',
-            name: '',
-
-            interval: 0,
-            axisLabel: {
-              show: true,
-              formatter: '{value}'
-            },
-            axisLine: {
-              show: true,
-              lineStyle: {
-                color: '#000'
-              }
-            },
-            axisTick: {
-              show: false
-            },
-            splitLine: {
-              show: false
-            }
-          }],
+          xAxis: {
+            data: _.map(data.fund_trends, v => moment(v.date).format('MM-DD'))
+          },
           series: [{
             name: '申购',
             type: 'line',
@@ -303,7 +270,6 @@ export default {
           }, {
             name: '到期',
             type: 'line',
-            //yAxisIndex: 1,
             data: _.map(data.fund_trends, v => v.settlement),
             color: ['#19b8bc'],
             symbolSize: 10,
@@ -311,7 +277,6 @@ export default {
           }, {
             name: '赎回',
             type: 'line',
-            //yAxisIndex: 1,
             data: _.map(data.fund_trends, v => v.redeemed),
             color: ['#41a5d7'],
             symbolSize: 10,
@@ -319,15 +284,13 @@ export default {
           }, {
             name: '发行',
             type: 'line',
-            //yAxisIndex: 1,
             data: _.map(data.fund_trends, v => v.issurance),
             color: ['#ad74d5'],
             symbolSize: 10,
             symbol: 'circle'
           }, {
-            name: '现金流',
+            name: '净现金流',
             type: 'bar',
-            //yAxisIndex: 1,
             data: _.map(data.fund_trends, v => v.net_cash_flow),
             color: ['#d1d2d4'],
             symbolSize: 10,
@@ -346,7 +309,10 @@ export default {
 
     // 今日更新
     updatedProductsGet() {
-      return updatedProducts.get().then(res => res.json()).then(data => {
+      return updatedProducts.get({
+        page: 1,
+        per_page: 100
+      }).then(res => res.json()).then(data => {
         this.updateSummary = data.summary
         this.updateVas = _.groupBy(data.virtual_assets, v => v.consignee)
       })
@@ -384,14 +350,6 @@ export default {
       stocktrends: '',
       stockName: '',
       stockChartOption: {
-        tooltip: {
-          formatter: (params, ticket, callback) => {
-            if (!params.length) return
-            return _.concat([`<div>${params[0].name}`], params.map(v => {
-              return `<p>${v.seriesName}:${Vue.filter('ktCurrency')(v.value)}</p>`
-            }), '</div>').join('')
-          }
-        },
         legend: {
           data: [{
             name: '存续本金',
@@ -403,7 +361,6 @@ export default {
         },
         xAxis: {
           type: 'category',
-          // data: _.map(data, v => moment(v.date).format('MM.DD')),
           splitLine: {
             show: false
           },
@@ -418,14 +375,6 @@ export default {
 </script>
 
 <style lang="scss" scope>
-.fl {
-  float: left;
-}
-
-.fr {
-  float: right;
-}
-
 .overview {
   background: #ecf1f7;
   h2 {
@@ -554,8 +503,8 @@ export default {
 }
 
 .overview-table {
-  max-height: 500px;
-  overflow-y: scroll;
+  // max-height: 500px;
+  // overflow-y: auto;
 }
 
 //趋势图
@@ -563,6 +512,7 @@ export default {
   overflow: hidden;
   .trend-product,
   .trend-stock {
+    position: relative;
     background: #fff;
     border-radius: 4px;
     padding: 10px;
@@ -582,23 +532,29 @@ export default {
   .crumbs {
     overflow-x: auto;
     width: 100%;
+    text-align: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 65px;
+    z-index: 9;
     ul {
-      width: 100000px;
+      display: inline-block;
+      // width: 100000px;
     }
     li {
       list-style: none;
       display: inline-block;
-      padding: 10px 10px;
-      font-size: 14px;
+      padding: 5px 10px;
+      font-size: 12px;
       color: #55627b;
       cursor: pointer;
-      &:before{
-        content:'';
-        width:8px;
-        height:8px;
+      &:before {
+        content: '';
+        width: 8px;
+        height: 8px;
         background: #333;
         border-radius: 100%;
-
       }
       &.active {
         color: #35cec3;
@@ -607,11 +563,11 @@ export default {
   }
   .trend-chart {
     width: 100%;
-    height: 300px;
+    height: 350px;
   }
   .capital-chart {
     width: 100%;
-    padding:10px 0;
+    padding: 10px 0;
     height: 350px;
   }
 }
