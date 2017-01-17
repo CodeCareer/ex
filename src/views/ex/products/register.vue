@@ -33,7 +33,7 @@ section.products
               th 客户数量
           tbody
             tr(v-if='!products.length')
-              td.text-center(colspan='8') 没有数据！
+              td.text-center(colspan='8') 暂无数据
             tr(v-if='products.length', v-for='p in products')
               td {{p.product_code}}
               td {{p.balance | ktCurrency}}

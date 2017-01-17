@@ -40,8 +40,8 @@ export default [{
         name: '产品列表',
         to: { name: 'products' }
       }, {
-        placeholder: '产品总览',
-        name: 'productName',
+        id: 'productName',
+        name: '产品总览',
         to: { name: 'productDashboard' }
       }]
     }
@@ -79,8 +79,8 @@ export default [{
           name: '产品列表',
           to: { name: 'products' }
         }, {
-          placeholder: '编辑产品',
-          name: 'productName',
+          name: '编辑产品',
+          id: 'productName',
           to: { name: 'productForm' }
         }]
       }

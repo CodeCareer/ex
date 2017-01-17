@@ -1,8 +1,12 @@
 .chart-tooltip {
   background: none;
+  table-layout: auto;
   tr {
     background: none;
     border: none;
+    &:hover {
+      background: none!important;
+    }
     th {
       text-align: left;
     }

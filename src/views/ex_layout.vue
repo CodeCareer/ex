@@ -19,7 +19,7 @@
           el-menu-item(index='1-3', :route='{name: "productsRegister"}', :class='{"is-active": $route.path.startsWith(menuActiveStatusMap.productsRegister)}') 登记产品总列表
     .body(:style='containerStyles')
       el-breadcrumb
-        el-breadcrumb-item(v-for="crumb in crumbs", :to="crumb.to") {{crumb.placeholder || crumb.name}}
+        el-breadcrumb-item(v-for="crumb in crumbs", :to="crumb.to") {{crumb.name}}
       router-view
       footer
         p(style="margin-bottom: 10px;") 联系电话：010-84554188   京ICP备150220058号-1
@@ -77,9 +77,9 @@ export default {
     // 更新面包屑中的占位符
     updateCrumbs.$on('update-crumbs', crumbs => {
       _.each(crumbs, cr => {
-        let co = this.crumbs.find(c => c.name === cr.name)
+        let co = this.crumbs.find(c => c.id === cr.id)
         if (co) {
-          co.name = cr.value
+          co.name = cr.name
           co.placeholder = ''
         }
       })

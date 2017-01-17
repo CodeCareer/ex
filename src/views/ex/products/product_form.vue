@@ -14,8 +14,8 @@
               el-input(placeholder='请输入产品简称', v-model="product.product_short_name")
             el-form-item.el-input--xs(label="产品代码：", prop="product_code")
               el-input(placeholder='请输入产品代码', v-model="product.product_code")
-            el-form-item.el-input--xs(label="发行利率：", prop="annual_rate", @change.native="numberTrim($event, product.annual_rate)")
-              el-input(placeholder='建议填写', v-model.number="product.annual_rate")
+            el-form-item.el-input--xs(label="发行利率：", prop="annual_rate")
+              el-input(placeholder='建议填写', v-model="product.annual_rate")
                template(slot='append') %
             el-form-item.el-input--xs(label="起息日：", prop="value_at")
               el-date-picker(v-model="product.value_at", type="date", placeholder="建议填写", :picker-options="valueAtOptions", @change="calculateSustained")
@@ -26,12 +26,12 @@
                template(slot='append') 天
           .right
             el-form-item.el-input--xs(label="计划募集金额：", prop="allocated_amount")
-              el-input(placeholder='建议填写，示例：50000', v-model.number="product.allocated_amount", @change.native="numberTrim($event, product.allocated_amount)")
+              el-input(placeholder='建议填写，示例：50000', v-model="product.allocated_amount")
                 template(slot='append') 元
             el-form-item.el-input--xs(label="实际募集金额：", prop="subscription_amount")
-              el-input(placeholder='该字段填写后不可修改。示例：50000', v-model.number="product.subscription_amount", @change.native="numberTrim($event, product.subscription_amount)")
+              el-input(placeholder='该字段填写后不可修改。示例：50000', v-model="product.subscription_amount")
                 template(slot='append') 元
-            el-form-item.el-input--xs(label="产品风险评级：", prop="subscription_amount")
+            el-form-item.el-input--xs(label="产品风险评级：", prop="raw_risk_level")
               el-select(v-model="product.raw_risk_level", placeholder="请选择风险等级")
                 el-option(v-for='item in riskLevelOptions', :label='item.label', :value='item.value')
             el-form-item.el-input--xs(label="上架日期：", prop="published_start_at")
@@ -125,19 +125,22 @@ export default {
         virtual_asset_id: id
       }).then(res => res.json())
 
-      updateCrumbs.$emit('update-crumbs', [{
-        name: 'productName',
-        value: data.virtual_asset.name
-      }])
+      setTimeout(() => {
+        updateCrumbs.$emit('update-crumbs', [{
+          id: 'productName',
+          name: data.virtual_asset.name
+        }])
+      }, 100)
+
+      data.virtual_asset.consignee_name = _.get(_.find(this.consignees, c => c.id === data.virtual_asset.consignee_id), 'value')
+      if (data.virtual_asset.annual_rate) data.virtual_asset.annual_rate *= 100
 
       this.product = data.virtual_asset
-      this.product.annual_rate *= 100
-      this.product.consignee_name = _.get(_.find(this.consignees, c => c.id === data.virtual_asset.consignee_id), 'value')
     } else {
       setTimeout(() => {
         updateCrumbs.$emit('update-crumbs', [{
-          name: 'productName',
-          value: '新增产品'
+          id: 'productName',
+          name: '新增产品'
         }])
       }, 100)
     }
@@ -146,7 +149,7 @@ export default {
   methods: {
     // 机构名称实时筛选
     queryConsigneeSearch(queryString, cb) {
-      var results = queryString ? this.consignees.filter(v => v.value.includes(queryString)) : this.consignees
+      var results = queryString ? this.consignees.filter(v => v.value.includes(queryString)) : []
 
       // 调用 callback 返回建议列表的数据
       cb(results)
@@ -193,13 +196,12 @@ export default {
     },
 
     // 剔除非数字字符, 解决输入非数字结果不被自动清除的问题
-    numberTrim(e, value) {
-      this.$nextTick(() => {
-        setTimeout(() => {
-          e.target.value = value
-        }, 10)
-      })
-    },
+    // numberTrim(e, value) {
+    //   if (value === '') return
+    //   setTimeout(() => {
+    //     e.target.value = value
+    //   }, 100)
+    // },
 
     // 结算时限
     // settleDeadlineMinuteChange(value) {
@@ -299,6 +301,17 @@ export default {
       cb()
     }
 
+    // 修正数字验证
+    let validateNumber = (rule, value, cb) => {
+      if (value !== '' && value !== null && rule.pattern && !rule.pattern.test(value)) {
+        cb(new Error(`请正确填写数字格式`))
+      } else if (value !== '' && value !== null && rule.min && value < rule.min) {
+        cb(new Error(`请正确填写数字，不能小于${rule.min}`))
+      } else {
+        cb()
+      }
+    }
+
     let sdMinutes = _.flatten(_.range(24).map(vh => {
       return _.range(4).map(vm => {
         return {
@@ -390,8 +403,11 @@ export default {
           message: '文本，字数不得超过50'
         }],
         annual_rate: [{
-          type: 'number',
-          message: '请正确输入利率'
+          pattern: /^\d+(?:\.\d+)?$/,
+          min: 0.01,
+          // type: 'number',
+          validator: validateNumber,
+          message: '请正确输入利率, 不能小于0.01'
         }],
         value_at: [{
           gt: 'product.published_start_at',
@@ -406,14 +422,15 @@ export default {
           validator: validateCompareDate
         }],
         allocated_amount: [{
-          type: 'integer',
-          message: '请输入正整数',
-          min: 0
+          pattern: /^\d+$/,
+          message: '请输入正整数'
+            // min: 0
         }],
         subscription_amount: [{
-          type: 'integer',
-          message: '请输入正整数',
-          min: 0
+          pattern: /^\d+(?:\.\d+)?(?:-\d+(?:\.\d+)?)?$/,
+          message: '请输入正整数'
+            // type: 'integer',
+            // min: 0
         }],
         published_start_at: [{
           lt: 'product.published_end_at',

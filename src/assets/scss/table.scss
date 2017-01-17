@@ -8,6 +8,7 @@ table {
   width: 100%;
   font-size: 13px;
   color: #626473;
+  table-layout: fixed;
   thead {
     tr {
       background: #b4becf;
@@ -66,12 +67,16 @@ table {
       }
     }
     td {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
       &.text-center {
         text-align: center;
       }
       padding: 8px 5px;
     }
     a {
+      display: inline;
       &.link {
         color: #18b8ba;
         &:hover {

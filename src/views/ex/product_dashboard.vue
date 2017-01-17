@@ -1,8 +1,9 @@
 <template lang="pug">
   .content
-    .h1 {{virtualAsset.name}}
+    .h1
+      .title {{virtualAsset.name}}
       small(v-if="virtualAsset.created_from === 'asset_management'") 产品代码：
-        span {{virtualAsset.product_code}}
+        span {{virtualAsset.product_code | ktNull}}
       .right
         button.kt-btn.kt-btn-primary(@click="editProduct(virtualAsset)", :class="{disabled: virtualAsset.created_from !== 'asset_management'}") 编辑
         button.kt-btn.kt-btn-gray(@click="deleteProductChild(virtualAsset)", :class="{disabled: virtualAsset.created_from !== 'asset_management'}") 删除
@@ -34,7 +35,7 @@
                 em.em-money {{virtualAsset.settlement_interest | ktCurrency('')}}
         h3 累积募集金额（元）
         .overview-right-down
-          span {{virtualAsset.subscription_amount | ktCurrency('')}}
+          span {{virtualAsset.subscription_amount | ktCurrency('') | ktNull}}
     .today-detailed
       h2 今日明细
       .today-detailed-left.fl
@@ -96,13 +97,13 @@
           ul
             li
               span 用户名:
-              em {{virtualAsset.consignee_bank_account_name}}
+              em {{virtualAsset.consignee_bank_account_name | ktNull}}
             li
               span 账 &nbsp &nbsp户:
-              em {{virtualAsset.consignee_bank_account}}
+              em {{virtualAsset.consignee_bank_account | ktNull}}
             li
               span 开户行:
-              em {{virtualAsset.consignee_bank_name}}
+              em {{virtualAsset.consignee_bank_name | ktNull}}
           .sure(:class="[settlement.execute_status === '待执行' ? '' : 'disabled']", @click.prevent="submit") 确认执行
     .essential-information
       .essential-information-left.fl.essential-information-all
@@ -110,69 +111,70 @@
         ul
           li
             span 产品全称：
-            em {{virtualAsset.name |ktChangeData}}
+            em {{virtualAsset.name |ktNull}}
           li
             span 产品简称：
-            em {{virtualAsset.product_short_name |ktChangeData}}
+            em {{virtualAsset.product_short_name |ktNull}}
           li
             span 发行利率：
-            em {{virtualAsset.annual_rate |ktPercent | ktChangeData}}
+            em {{virtualAsset.annual_rate |ktPercent | ktNull}}
           li
             span 计划募集金额（元）：
-            em {{virtualAsset.allocated_amount |ktCurrency |ktChangeData}}
+            em {{virtualAsset.allocated_amount |ktCurrency |ktNull}}
           li
             span 待发行金额（元）：
-            em {{virtualAsset.unissued_amount |ktCurrency |ktChangeData}}
+            em {{virtualAsset.unissued_amount |ktCurrency |ktNull}}
           li
             span 兑付总额：
-            em {{virtualAsset.cash_amount |ktCurrency |ktChangeData}}
+            em {{virtualAsset.cash_amount |ktCurrency |ktNull}}
           li
             span 起购金额（元）：
-            em {{virtualAsset.min_subscription_amount |ktCurrency|ktChangeData}}
+            em {{virtualAsset.min_subscription_amount |ktCurrency|ktNull}}
           li
             span 递增金额（元）：
-            em {{virtualAsset.increase_amount |ktCurrency|ktChangeData}}
+            em {{virtualAsset.increase_amount |ktCurrency|ktNull}}
           li
             span 产品投向（范围）：
-            em(:class="{look:virtualAsset.orientated_to}",@click="look") {{virtualAsset.orientated_to |ktLook|ktChangeData}}
+            em(:class="{look:virtualAsset.orientated_to}",@click="look") {{virtualAsset.orientated_to |ktLook|ktNull}}
           li
             span 产品风险等级：
-            em {{virtualAsset.risk_level |ktChangeData}}
+            em {{virtualAsset.risk_level |ktNull}}
       .essential-information-right.fr.essential-information-all
         h3 关键日期和期限
         ul
           li
             span 上架日期 ：
-            em {{virtualAsset.published_start_at |ktChangeData}}
+            em {{virtualAsset.published_start_at |ktNull}}
           li
             span 下架日期 ：
-            em {{virtualAsset.published_end_at | ktChangeData}}
+            em {{virtualAsset.published_end_at | ktNull}}
           li
             span 募集期（天）：
-            em {{virtualAsset.reserved_sustained |ktChangeData}}
+            em {{virtualAsset.reserved_sustained |ktNull}}
           li
             span 起息日：
-            em {{virtualAsset.value_at | ktChangeData}}
+            em {{virtualAsset.value_at | ktNull}}
           li
             span 到期日：
-            em {{virtualAsset.due_at | ktChangeData}}
+            em {{virtualAsset.due_at | ktNull}}
           li
             span 还款日：
-            em {{virtualAsset.repayment_at | ktChangeData}}
+            em {{virtualAsset.repayment_at | ktNull}}
           li
             span 发行期限：
-            em {{virtualAsset.sustained |ktChangeData}}
+            em {{virtualAsset.sustained |ktNull}}
           li
             span 开放间隔期（天）：
-            em {{virtualAsset.open_cycle |ktChangeData}}
+            em {{virtualAsset.open_cycle |ktNull}}
           li
             span 开放日：
-            em {{virtualAsset.open_at |ktChangeData}}
+            em {{virtualAsset.open_at |ktNull}}
     .stock
       h2 存量情况
       .stock-all
         .stock-all-left.fl
           kt-bar-chart(:chart-option="stockChartOption")
+          .no-chart-data(v-if="!stockData.balance_trends.length") 暂无数据
         .stock-all-right.fr
           h3 存量登记产品详情
           .table-one
@@ -185,11 +187,13 @@
           .table-two(ref="dropDown")
             table
               tbody
-                tr(v-for="registeredProduct in registeredProducts")
+                tr(v-for="registeredProduct in registeredProducts", v-if="registeredProducts.length")
                   td {{registeredProduct.product_code}}
                   td {{registeredProduct.balance | ktCurrency}}
                   td
                     a.link(@click="showInvestors(registeredProduct)") {{registeredProduct.investor_count}}
+                tr(v-if="!registeredProducts.length")
+                  td(colspan="3").text-center 暂无数据
     investor-dialog(ref="investorDialog")
 </template>
 
@@ -253,8 +257,8 @@ export default {
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         updateCrumbs.$emit('update-crumbs', [{
-          name: 'productName',
-          value: data.virtual_asset.name
+          id: 'productName',
+          name: data.virtual_asset.name
         }])
 
         this.virtualAsset = data.virtual_asset
@@ -304,6 +308,7 @@ export default {
       return productStock.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
+        this.stockData = data
         this.stockChartOption = _.merge({}, this.stockChartOption, {
           legend: {
             data: [{
@@ -453,6 +458,9 @@ export default {
 
   data() {
     return {
+      stockData: {
+        balance_trends: []
+      },
       virtualAsset: '',
       updated: '',
       settlement: '',
@@ -486,7 +494,17 @@ export default {
     width: 100%;
     height: 38px;
     line-height: 38px;
+    .title,
     small {
+      display: inline-block;
+      max-width: 400px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: -2px;
+    }
+    small {
+      vertical-align: -3px;
       margin-left: 20px;
       font-size: 13px;
     }
@@ -740,7 +758,15 @@ export default {
   border-radius: 4px;
   overflow: hidden;
   padding: 25px 20px;
+  .no-chart-data {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%), translateY(-50%);
+    z-index: 99;
+  }
   .stock-all-left {
+    position: relative;
     background: #fff;
     height: 300px;
     width: 52%;
@@ -835,7 +861,11 @@ export default {
         em {
           width: 47%;
           display: inline-block;
+          vertical-align: middle;
           font-style: normal;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
           color: #616a7b;
         }
         .look {

@@ -5,7 +5,7 @@
       table
         thead
           tr
-            th 产品名称
+            th(width="300") 产品名称
             th.order-column(:class='[{active: query.sort_by === "balance"}, query.order]', @click='sortBy("balance")')
               | 存续金额
               span.icon-order-group
@@ -40,16 +40,16 @@
                 i.icon-icomoon.icon-arrow-top.desc
         tbody
           tr(v-if='!products.length')
-            td.text-center(colspan='9') 没有数据！
+            td.text-center(colspan='9') 暂无数据
           tr(v-if='products.length', v-for='p in products', @click='trClick(p)')
             td
               router-link(:to='{name: "productDashboard", params: {id: p.id}}') {{p.name}}
             td {{p.balance | ktCurrency}}
-            td {{p.annual_rate | ktPercent |ktChangeData}}
-            td {{p.sustained |ktChangeData}}
-            td {{p.due_at |ktChangeData}}
-            td {{p.open_type |ktChangeData}}
-            td {{p.consignee |ktChangeData}}
+            td {{p.annual_rate | ktPercent | ktNull}}
+            td {{p.sustained | ktNull}}
+            td {{p.due_at | ktNull}}
+            td {{p.open_type | ktNull}}
+            td {{p.consignee | ktNull}}
             td.status-column
               i.icon-icomoon(:class='p.update_status | updateStatusIcon')
               span {{p.update_status}}
