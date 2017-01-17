@@ -16,6 +16,7 @@ export default {
   },
 
   methods: {
+    // 排序
     sortBy(field) {
       if (this.query.sort_by !== field) {
         this.query.order = null
@@ -41,6 +42,7 @@ export default {
       })
     },
 
+    // 分页
     pageChange(currentPage) {
       // if (this.queryChange) return
       this.query.page = currentPage

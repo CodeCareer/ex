@@ -1,1 +1,21 @@
-
+.products {
+  position: relative;
+  .buttons-topbar {
+    // position: absolute;
+    // top: 0;
+    line-height: 35px;
+    // right: 10px;
+    text-align: right;
+  }
+  .el-tabs {
+    vertical-align: top;
+  }
+  .shared-pane {
+    margin-bottom: 40px;
+    border-radius: 4px;
+    position: relative;
+    z-index: 9;
+    padding: 10px;
+    background: white;
+  }
+}

@@ -104,6 +104,25 @@ body {
       color: $primary_color;
     }
   }
+  .el-dialog--tiny {
+    width: 29%;
+  }
+  .el-dialog__header {
+    padding: 15px 10px 0;
+  }
+  .el-dialog__title {
+    color: #626473;
+    font-size: 15px;
+    font-weight: 400;
+  }
+  .el-dialog__body {
+    padding: 10px 10px;
+  }
+  .el-dialog__close {
+    &:hover {
+      color: $primary_color;
+    }
+  }
   .el-button:focus,
   .el-button:hover {
     color: $primary_color;
@@ -220,6 +239,7 @@ body {
       }
       font-size: 13px;
       line-height: 25px;
+      // font-weight: 300;
     }
   }
   .el-input--xs {
@@ -308,5 +328,21 @@ body {
       background-color: darken($primary_color, 5%);
       border-color: darken($primary_color, 5%);
     }
+  }
+  .el-form-item__error {
+    font-weight: normal;
+  }
+  .el-breadcrumb__item__inner,
+  .el-breadcrumb__item__inner a {
+    &:hover {
+      color: $primary_color;
+    }
+    // color: #626472;
+  }
+  .el-breadcrumb__item:last-child .el-breadcrumb__item__inner,
+  .el-breadcrumb__item:last-child .el-breadcrumb__item__inner a,
+  .el-breadcrumb__item:last-child .el-breadcrumb__item__inner a:hover,
+  .el-breadcrumb__item:last-child .el-breadcrumb__item__inner:hover {
+    color: $primary_color;
   }
 }

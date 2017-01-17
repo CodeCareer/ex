@@ -15,8 +15,11 @@
             i.icon-icomoon.icon-list
             | 产品管理
           el-menu-item(index='1-1', :route='{name: "dashboard"}', :class='{"is-active": $route.path.startsWith(menuActiveStatusMap.dashboard)}') 今日总览
-          el-menu-item(index='1-2', :route='{name: "products"}', :class='{"is-active": $route.path.startsWith(menuActiveStatusMap.products)}') 产品汇总
+          el-menu-item(index='1-2', :route='{name: "productsAll"}', :class='{"is-active": $route.path.startsWith(menuActiveStatusMap.productsAll)}') 产品总列表
+          el-menu-item(index='1-3', :route='{name: "productsRegister"}', :class='{"is-active": $route.path.startsWith(menuActiveStatusMap.productsRegister)}') 登记产品总列表
     .body(:style='containerStyles')
+      el-breadcrumb
+        el-breadcrumb-item(v-for="crumb in crumbs", :to="crumb.to") {{crumb.placeholder || crumb.name}}
       router-view
       footer
         p(style="margin-bottom: 10px;") 联系电话：010-84554188   京ICP备150220058号-1
@@ -30,12 +33,17 @@ import {
   Menu,
   Submenu,
   MenuItem,
-  MenuItemGroup
+  MenuItemGroup,
+  Breadcrumb,
+  BreadcrumbItem
 } from 'element-ui'
 import {
   mapGetters,
   mapActions
 } from 'vuex'
+import {
+  updateCrumbs
+} from '../common/crossers.js'
 import _ from 'lodash'
 
 let headerH = 60 // header高度
@@ -46,19 +54,37 @@ export default {
     ElCol: Col,
     ElMenu: Menu,
     ElSubmenu: Submenu,
+    ElBreadcrumb: Breadcrumb,
+    ElBreadcrumbItem: BreadcrumbItem,
     ElMenuItem: MenuItem,
     ElMenuItemGroup: MenuItemGroup
   },
 
   watch: {
     '$route' (to, from) {
+      this.breadcrumbRefresh()
       setTimeout(() => {
         this.amendMenuActiveStatus(this.$refs.menus)
       }, 100)
     }
   },
 
+  created() {
+    this.breadcrumbRefresh()
+  },
+
   mounted() {
+    // 更新面包屑中的占位符
+    updateCrumbs.$on('update-crumbs', crumbs => {
+      _.each(crumbs, cr => {
+        let co = this.crumbs.find(c => c.name === cr.name)
+        if (co) {
+          co.name = cr.value
+          co.placeholder = ''
+        }
+      })
+    })
+
     window.addEventListener('resize', e => {
       this.containerStyles.minHeight = `${window.innerHeight - headerH}px`
     })
@@ -77,6 +103,11 @@ export default {
         }
       })
     },
+
+    // 刷新面包屑
+    breadcrumbRefresh() {
+      this.crumbs = this.$route.meta.crumbs
+    },
     ...mapActions(['logout'])
   },
 
@@ -86,9 +117,12 @@ export default {
 
   data() {
     return {
+      crumbs: [],
       menuActiveStatusMap: {
         dashboard: '/ex/dashboard',
-        products: '/ex/products'
+        products: '/ex/products',
+        productsAll: '/ex/products',
+        productsRegister: '/ex/register_products'
       },
       containerStyles: {
         minHeight: (window.innerHeight - headerH) + 'px'
@@ -100,9 +134,12 @@ export default {
 
 <style lang="scss">
 $headerHeight: 60px;
-$menuWidth: 140px;
+$menuWidth: 150px;
 $menuHeight: 40px;
 .ex-container {
+  .el-breadcrumb {
+    margin-bottom: 15px;
+  }
   header {
     .logo {
       margin-left: 20px;
@@ -152,7 +189,7 @@ $menuHeight: 40px;
   .body {
     position: relative;
     z-index: 1;
-    padding: 20px 20px 150px;
+    padding: 15px 15px 150px;
   }
   footer {
     // left: $menuWidth;
@@ -182,7 +219,7 @@ $menuHeight: 40px;
       color: white;
       height: $menuHeight;
       line-height: $menuHeight;
-      padding: 0 20px 0 30px;
+      padding: 0 20px 0 30px!important;
       a {
         color: white;
       }
@@ -219,12 +256,12 @@ $menuHeight: 40px;
       &.ignore-status + em {
         @extend .red-color;
       }
-      &.status-now+em{
+      &.status-now+em {
         @extend .green-color;
       }
     }
     .icon-warn {
-      &+em{
+      &+em {
         @extend .gray-color;
       }
     }
@@ -237,6 +274,7 @@ $menuHeight: 40px;
     }
   }
 }
+
 // .status-update {
 //   .icon-icomoon{
 //     color:#c8cfd6;
@@ -259,6 +297,5 @@ $menuHeight: 40px;
 //       @extend .green-color;
 //     }
 //   }
-
 // }
 </style>

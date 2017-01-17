@@ -23,7 +23,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/internal/api': {
-        // target: 'http://10.132.1.188:3000',
+        // target: 'http://liuxiangrmbp.local:3000',
         target: 'http://opt-baton.ktjr.com',
         changeOrigin: true
           // pathRewrite: {

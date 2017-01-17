@@ -183,6 +183,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import "./products.scss";
 .products-all {
   .pages {
     text-align: center;

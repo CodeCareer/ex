@@ -19,16 +19,19 @@ let excuteStatusIconMap = {
 
 export default {
   filters: {
+    // 产品状态
     updateStatusIcon(value) {
       return updateStatusIconMap[value] || ''
     },
+    // 执行状态
     excuteStatusIcon(value) {
       return excuteStatusIconMap[value] || ''
     }
   },
   methods: {
+    // 编辑产品
     editProduct(product) {
-      if (product.type === 'origin') {
+      if (product.created_from === 'baton') {
         Message({
           type: 'error',
           message: '非导入或录入产品不支持编辑'
@@ -43,13 +46,14 @@ export default {
         }
       })
     },
+    // 删除产品
     async deleteProduct(product) {
-      if (product.type === 'origin') {
+      if (product.created_from === 'baton') {
         Message({
           type: 'error',
           message: '非导入或录入产品不支持删除'
         })
-        return
+        return Promise.reject('非导入或录入产品不支持删除')
       }
 
       let action = await MessageBox({

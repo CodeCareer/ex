@@ -1,11 +1,11 @@
 <template lang="pug">
   .content
     .h1 {{virtualAsset.name}}
-      small(v-if="virtualAsset.type === 'origin'") 产品代码：
+      small(v-if="virtualAsset.created_from === 'asset_management'") 产品代码：
         span {{virtualAsset.product_code}}
       .right
-        button.kt-btn.kt-btn-primary(@click="editProduct(virtualAsset)", :class="{disabled: virtualAsset.type !== 'origin'}") 编辑
-        button.kt-btn.kt-btn-gray(@click="deleteProductChild(virtualAsset)", :class="{disabled: virtualAsset.type !== 'origin'}") 删除
+        button.kt-btn.kt-btn-primary(@click="editProduct(virtualAsset)", :class="{disabled: virtualAsset.created_from !== 'asset_management'}") 编辑
+        button.kt-btn.kt-btn-gray(@click="deleteProductChild(virtualAsset)", :class="{disabled: virtualAsset.created_from !== 'asset_management'}") 删除
     .today-overview
       h2 今日总览
       .overview-left.fl
@@ -188,7 +188,9 @@
                 tr(v-for="registeredProduct in registeredProducts")
                   td {{registeredProduct.product_code}}
                   td {{registeredProduct.balance | ktCurrency}}
-                  td {{registeredProduct.investor_count}}
+                  td
+                    a.link(@click="showInvestors(registeredProduct)") {{registeredProduct.investor_count}}
+    investor-dialog(ref="investorDialog")
 </template>
 
 <script>
@@ -198,9 +200,11 @@ import {
   MessageBox,
   Message,
   Loading,
+  Dialog,
   Tooltip
 } from 'element-ui'
 import ktBarChart from '../../components/kt-bar-echart.vue'
+import InvestorDialog from './products/_investor_dialog.vue'
 import {
   essentialInformation,
   productLiquidation,
@@ -208,9 +212,10 @@ import {
   productExecute,
   productStock,
   registeredProducts
-  // investor,
-  // fees
 } from '../../common/resources.js'
+import {
+  updateCrumbs
+} from '../../common/crossers.js'
 import _ from 'lodash'
 import moment from 'moment'
 
@@ -218,24 +223,47 @@ export default {
   mixins: [exMixin],
   components: {
     ktBarChart,
-    ElTooltip: Tooltip
+    InvestorDialog,
+    ElTooltip: Tooltip,
+    ElDialog: Dialog
   },
+
   methods: {
+    // 删除此产品
     deleteProductChild(product) {
       this.deleteProduct(product).then(() => {
         this.$router.back()
       })
     },
 
-    essentialInformationGet() { //产品基本信息
+    // 投资人列表
+    async showInvestors(product) {
+      let loadingInstance = Loading.service({
+        target: '.stock-all-right .table-two'
+      })
+
+      await this.$refs.investorDialog.show(product).catch(() => {
+        loadingInstance.close()
+      })
+      loadingInstance.close()
+    },
+
+    //产品基本信息
+    essentialInformationGet() {
       return essentialInformation.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
+        updateCrumbs.$emit('update-crumbs', [{
+          name: 'productName',
+          value: data.virtual_asset.name
+        }])
+
         this.virtualAsset = data.virtual_asset
       })
     },
 
-    productLiquidationGet() { //近期清算
+    //近期清算
+    productLiquidationGet() {
       return productLiquidation.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
@@ -248,7 +276,8 @@ export default {
       })
     },
 
-    updateGet() { //今日更新
+    //今日更新
+    updateGet() {
       return update.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
@@ -262,7 +291,8 @@ export default {
       })
     },
 
-    productExecutePost() { //产品执行post
+    //产品执行post
+    productExecutePost() {
       return productExecute.save({
         virtual_asset_id: this.$route.params.id
       }, {}).then(res => res.json()).then(data => {
@@ -270,14 +300,18 @@ export default {
       })
     },
 
-    productStockGet() { //单个产品的存量图表
+    //单个产品的存量图表
+    productStockGet() {
       return productStock.get({
         virtual_asset_id: this.$route.params.id
       }).then(res => res.json()).then(data => {
         this.stockChartOption = _.merge({}, this.stockChartOption, {
           tooltip: {
             formatter: (params, ticket, callback) => {
-              return '<div>' + params[0].name + '<br/>' + params[0].seriesName + ':' + Vue.filter('ktCurrency')(params[0].value) + '<br/>' + params[1].seriesName + ':' + Vue.filter('ktCurrency')(params[1].value) + '</div>'
+              if (!params.length) return
+              return _.concat([`<div>${params[0].name}`], params.map(v => {
+                return `<p>${v.seriesName}:${Vue.filter('ktCurrency')(v.value)}</p>`
+              }), '</div>').join('')
             }
           },
           legend: {
@@ -303,18 +337,21 @@ export default {
             name: '存续本金',
             type: 'bar',
             stack: '广告',
-            data: _.map(data.balance_trends, 'principal')
+            data: _.map(data.balance_trends, 'principal'),
+            barMaxWidth: 40
           }, {
             name: '存续利息',
             type: 'bar',
             stack: '广告',
-            data: _.map(data.balance_trends, 'interest')
+            data: _.map(data.balance_trends, 'interest'),
+            barMaxWidth: 40
           }]
         })
       })
     },
 
-    registeredProductsGet() { //单个产品下的存量登记产品列表
+    //单个产品下的存量登记产品列表
+    registeredProductsGet() {
       let loadingInstance = Loading.service({
         target: '.stock-all-right'
       })
@@ -379,12 +416,6 @@ export default {
         return
       }
     }
-    //单个登记产品下的客户 暂时预留
-    // investorGet() {
-    //   investor.get({}).then(res => res.json()).then(data => {
-
-    //   })
-    // },
     //单个产品的费用详情 暂时预留
     // feesGet() {
     //   fees.get({}).then(res => res.json()).then(data => {})
@@ -402,7 +433,6 @@ export default {
       this.updateGet(),
       this.productStockGet(),
       this.registeredProductsGet()
-      // this.investorGet()
       // this.feesGet()
     ]).then(() => {
       productLoading.close()
@@ -660,25 +690,24 @@ export default {
     ul {
       margin-top: 20px;
       li {
-        &:nth-of-type(2) {
-          border-top: 1px solid #e5e9f3;
-          border-bottom: 1px solid #e5e9f3;
-        }
-        // height:35px;
+        display: table-row;
         line-height: 35px;
-        padding:0px 25%;
         span {
+          width: 30%;
           text-align: right;
-          min-width: 70px;
+          min-width: 80px;
           margin-right: 10px;
           color: #8e98a9;
+          display: table-cell;
         }
         em {
+          display: table-cell;
           color: #55627b;
-          width: 110px;
+          // width: 260px;
+          padding: 0 10px;
           line-height: 15px;
           vertical-align: middle;
-          display: inline-block;
+          // display: inline-block;
           word-wrap: break-word;
           word-break: break-all;
         }

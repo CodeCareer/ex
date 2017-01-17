@@ -1,6 +1,6 @@
 <template lang="pug">
   .kt-panel
-    .panel-head 产品名称
+    .panel-head {{$route.params.id === 'new' ? '新增产品': product.name}}
     .panel-body
       el-form.login-form(ref="productForm", :model="product",label-width="115px", :rules="rules")
         .panel-body-title 基本信息
@@ -14,7 +14,7 @@
               el-input(placeholder='请输入产品简称', v-model="product.product_short_name")
             el-form-item.el-input--xs(label="产品代码：", prop="product_code")
               el-input(placeholder='请输入产品代码', v-model="product.product_code")
-            el-form-item.el-input--xs(label="发行利率：", prop="annual_rate")
+            el-form-item.el-input--xs(label="发行利率：", prop="annual_rate", @change.native="numberTrim($event, product.annual_rate)")
               el-input(placeholder='建议填写', v-model.number="product.annual_rate")
                template(slot='append') %
             el-form-item.el-input--xs(label="起息日：", prop="value_at")
@@ -26,20 +26,20 @@
                template(slot='append') 天
           .right
             el-form-item.el-input--xs(label="计划募集金额：", prop="allocated_amount")
-              el-input(placeholder='建议填写，示例：50000', v-model.number="product.allocated_amount")
+              el-input(placeholder='建议填写，示例：50000', v-model.number="product.allocated_amount", @change.native="numberTrim($event, product.allocated_amount)")
                 template(slot='append') 元
             el-form-item.el-input--xs(label="实际募集金额：", prop="subscription_amount")
-              el-input(placeholder='该字段填写后不可修改。示例：50000', v-model.number="product.subscription_amount")
+              el-input(placeholder='该字段填写后不可修改。示例：50000', v-model.number="product.subscription_amount", @change.native="numberTrim($event, product.subscription_amount)")
                 template(slot='append') 元
             el-form-item.el-input--xs(label="产品风险评级：", prop="subscription_amount")
-              el-select(v-model="product.risk_level", placeholder="请选择风险等级")
+              el-select(v-model="product.raw_risk_level", placeholder="请选择风险等级")
                 el-option(v-for='item in riskLevelOptions', :label='item.label', :value='item.value')
             el-form-item.el-input--xs(label="上架日期：", prop="published_start_at")
               el-date-picker(v-model="product.published_start_at", type="date", placeholder="请选择上架日期", :picker-options="valueAtOptions", @change="calculateAllocatedSustained")
             el-form-item.el-input--xs(label="下架日期：", prop="published_end_at")
               el-date-picker(v-model="product.published_end_at", type="date", placeholder="请选择上架日期", :picker-options="valueAtOptions", @change="calculateAllocatedSustained")
-            el-form-item.el-input--xs(label="募集期限：", prop="allocated_sustained")
-              el-input(placeholder='募集期限=下架日期-上架日期',:disabled="true", v-model="product.allocated_sustained")
+            el-form-item.el-input--xs(label="募集期限：", prop="reserved_sustained")
+              el-input(placeholder='募集期限=下架日期-上架日期',:disabled="true", v-model="product.reserved_sustained")
                template(slot='append') 天
             el-form-item.el-input--xs(label="结算时限：", prop="settle_deadline_minutes")
               el-autocomplete(v-model="product.settle_deadline_minutes", :fetch-suggestions="querySDMinutesSearch", placeholder="请输入结算时限", @select="handleSDMinutesSelect")
@@ -73,13 +73,25 @@ import {
   TimeSelect,
   Autocomplete,
   MessageBox,
+  Message,
   Select,
+  Loading,
   Option,
   Input,
   Button
 } from 'element-ui'
 import moment from 'moment'
 import _ from 'lodash'
+import {
+  consignees,
+  productOne,
+  essentialInformation
+} from '../../../common/resources.js'
+import {
+  updateCrumbs
+} from '../../../common/crossers.js'
+
+let loadingInstance
 
 export default {
   components: {
@@ -94,32 +106,48 @@ export default {
     ElAutocomplete: Autocomplete,
     ElButton: Button
   },
-  mounted() {
-    this.consignees = [{
-      value: '机构1',
-      id: '1'
-    }, {
-      value: '机构2',
-      id: '2'
-    }, {
-      value: '机构3',
-      id: '3'
-    }, {
-      value: '机构4',
-      id: '4'
-    }, {
-      value: '机构5',
-      id: '5'
-    }, {
-      value: '其它',
-      id: 'other'
-    }]
+
+  async mounted() {
+    let {
+      id
+    } = this.$route.params
+
+    let consigneesData = await consignees.get().then(res => res.json())
+    this.consignees = _.map(consigneesData.consignees, v => {
+      return {
+        id: v.id,
+        value: v.name
+      }
+    })
+
+    if (id && id !== 'new') {
+      let data = await essentialInformation.get({
+        virtual_asset_id: id
+      }).then(res => res.json())
+
+      updateCrumbs.$emit('update-crumbs', [{
+        name: 'productName',
+        value: data.virtual_asset.name
+      }])
+
+      this.product = data.virtual_asset
+      this.product.consignee_name = _.get(_.find(this.consignees, c => c.id === data.virtual_asset.consignee_id), 'value')
+    } else {
+      setTimeout(() => {
+        updateCrumbs.$emit('update-crumbs', [{
+          name: 'productName',
+          value: '新增产品'
+        }])
+      }, 100)
+    }
   },
+
   methods: {
     // 机构名称实时筛选
     queryConsigneeSearch(queryString, cb) {
       var results = queryString ? this.consignees.filter(v => v.value.includes(queryString)) : this.consignees
-        // 调用 callback 返回建议列表的数据
+
+      // 调用 callback 返回建议列表的数据
       cb(results)
     },
 
@@ -159,26 +187,65 @@ export default {
     calculateAllocatedSustained() {
       if (this.product.published_start_at && this.product.published_end_at) {
         this.reValidate(['value_at', 'published_start_at', 'published_end_at'])
-        this.product.allocated_sustained = moment(this.product.published_end_at).diff(moment(this.product.published_start_at), 'days')
+        this.product.reserved_sustained = moment(this.product.published_end_at).diff(moment(this.product.published_start_at), 'days')
       }
     },
 
-    // 结算时限
-    settleDeadlineMinuteChange(value) {
-      this.product.settle_deadline_minutes = value
-      console.log(value)
+    // 剔除非数字字符, 解决输入非数字结果不被自动清除的问题
+    numberTrim(e, value) {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          e.target.value = value
+        }, 10)
+      })
     },
 
+    // 结算时限
+    // settleDeadlineMinuteChange(value) {
+    //   this.product.settle_deadline_minutes = value
+    //   console.log(value)
+    // },
+
+    // 提交表单
     submitForm() {
       this.$refs.productForm.validate((valid) => {
         if (valid) {
-          // loadingInstance = Loading.service({
-          //   target: this.$refs.productForm
-          // })
+          loadingInstance = Loading.service({
+            target: this.$refs.productForm.$el
+          })
+
+          let savePromise
+          if (this.$route.params.id === 'new') { // 新建
+            savePromise = productOne.save({
+              action: 'create'
+            }, this.product)
+          } else {
+            savePromise = productOne.update({ // 编辑
+              virtual_asset_id: this.product.id,
+              action: 'update'
+            }, this.product)
+          }
+
+          savePromise.then(res => res.json()).then(data => {
+            loadingInstance.close()
+            Message({
+              type: 'success',
+              message: '保存成功！'
+            })
+            this.$router.push({
+              name: 'productDashboard',
+              params: {
+                id: this.product.id || data.id
+              }
+            })
+          }).catch(res => {
+            loadingInstance.close()
+          })
         }
       })
     },
 
+    // 取消提交表单
     cancelForm() {
       MessageBox.confirm('确认离开吗?', '提示', {
         confirmButtonText: '确定',
@@ -225,9 +292,10 @@ export default {
 
     // 时间验证
     let validateTime = (rule, value, cb) => {
-      if (rule.timeFormat && moment(value, rule.timeFormat).format(rule.timeFormat) !== value) {
-        cb(new Error(`请正确填写时间格式例如${moment().format(rule.timeFormat)}`))
+      if (value && rule.timeFormat && moment(value, rule.timeFormat).format(rule.timeFormat) !== value) {
+        cb(new Error(`请正确填写时间格式，例如${moment().format(rule.timeFormat)}`))
       }
+      cb()
     }
 
     let sdMinutes = _.flatten(_.range(24).map(vh => {
@@ -246,10 +314,10 @@ export default {
       },
       daysOfYearOptions: [{ // 年化计息天数
         label: '360 天',
-        value: 1
+        value: '1'
       }, {
         label: '365 天',
-        value: 2
+        value: '2'
       }],
       riskLevelOptions: [{ // 风险等级
         label: '低',
@@ -272,7 +340,7 @@ export default {
       product: {
         name: '', // 产品名称
         consignee_id: '', //销售平台id
-        risk_level: '', //风险等级
+        raw_risk_level: 'L', //风险等级
         consignee_name: '', //销售平台名称
         product_short_name: '', // 产品简称
         product_code: '', // 产品代码
@@ -280,13 +348,13 @@ export default {
         value_at: '', // 起息日
         due_at: '', // 到期日
         sustained: null, // 发行期限
-        days_of_year: '', //年化计息天数
+        days_of_year: '2', //年化计息天数
         subscription_amount: null, // 实际募集金额
         allocated_amount: null, // 计划募集金额
         published_start_at: '', // 产品上架时间
         published_end_at: '', // 产品下架时间
-        allocated_sustained: '', // 募集期限
-        settle_deadline_minutes: '', // 结算时限
+        reserved_sustained: '', // 募集期限
+        settle_deadline_minutes: '17:00', // 结算时限
         consignee_bank_name: '', // 平台开户银行
         consignee_bank_account: '', //平台银行账户
         consignee_bank_account_name: '' //平台银行账户名称
@@ -385,7 +453,7 @@ export default {
 
 <style lang="scss">
 .kt-panel {
-  margin: -10px;
+  // margin: -10px;
   .panel-head {
     height: 40px;
     line-height: 40px;

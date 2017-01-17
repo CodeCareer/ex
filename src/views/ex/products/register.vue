@@ -1,56 +1,61 @@
 <template lang="pug">
-  .products-register
-    kt-filters(:conditions='filters')
-    .table
-      table
-        thead
-          tr
-            th 产品代码
-            th.order-column(:class='[{active: query.sort_by === "balance"}, query.order]', @click='sortBy("balance")')
-              | 规模
-              span.icon-order-group
-                i.icon-icomoon.icon-arrow-top.asc
-                i.icon-icomoon.icon-arrow-top.desc
-            th.order-column(:class='[{active: query.sort_by === "rate"}, query.order]', @click='sortBy("rate")')
-              | 利率
-              span.icon-order-group
-                i.icon-icomoon.icon-arrow-top.asc
-                i.icon-icomoon.icon-arrow-top.desc
-            th.order-column(:class='[{active: query.sort_by === "sustained"}, query.order]', @click='sortBy("sustained")')
-              | 期限
-              span.icon-order-group
-                i.icon-icomoon.icon-arrow-top.asc
-                i.icon-icomoon.icon-arrow-top.desc
-            th.order-column(:class='[{active: query.sort_by === "expired_at"}, query.order]', @click='sortBy("expired_at")')
-              | 到期日
-              span.icon-order-group
-                i.icon-icomoon.icon-arrow-top.asc
-                i.icon-icomoon.icon-arrow-top.desc
-            th 产品类型
-            th 发行平台
-            th 客户数量
-        tbody
-          tr(v-if='!products.length')
-            td.text-center(colspan='8') 没有数据！
-          tr(v-if='products.length', v-for='p in products')
-            td {{p.product_code}}
-            td {{p.balance | ktCurrency}}
-            td {{p.annual_rate | ktPercent}}
-            td {{p.sustained}}
-            td {{p.due_at}}
-            td {{p.open_type}}
-            td {{p.consignee}}
-            td {{p.investor_count}}
-    .pages
-      el-pagination(small, :current-page='query.page', :total='total_count', :page-size='query.per_page', layout='prev, pager, next, total, jumper', @current-change='pageChange')
-</template>
+section.products
+  .shared-pane
+    .products-register
+      kt-filters(:conditions='filters')
+      .table
+        table
+          thead
+            tr
+              th 产品代码
+              th.order-column(:class='[{active: query.sort_by === "balance"}, query.order]', @click='sortBy("balance")')
+                | 规模
+                span.icon-order-group
+                  i.icon-icomoon.icon-arrow-top.asc
+                  i.icon-icomoon.icon-arrow-top.desc
+              th.order-column(:class='[{active: query.sort_by === "rate"}, query.order]', @click='sortBy("rate")')
+                | 利率
+                span.icon-order-group
+                  i.icon-icomoon.icon-arrow-top.asc
+                  i.icon-icomoon.icon-arrow-top.desc
+              th.order-column(:class='[{active: query.sort_by === "sustained"}, query.order]', @click='sortBy("sustained")')
+                | 期限
+                span.icon-order-group
+                  i.icon-icomoon.icon-arrow-top.asc
+                  i.icon-icomoon.icon-arrow-top.desc
+              th.order-column(:class='[{active: query.sort_by === "expired_at"}, query.order]', @click='sortBy("expired_at")')
+                | 到期日
+                span.icon-order-group
+                  i.icon-icomoon.icon-arrow-top.asc
+                  i.icon-icomoon.icon-arrow-top.desc
+              th 产品类型
+              th 发行平台
+              th 客户数量
+          tbody
+            tr(v-if='!products.length')
+              td.text-center(colspan='8') 没有数据！
+            tr(v-if='products.length', v-for='p in products')
+              td {{p.product_code}}
+              td {{p.balance | ktCurrency}}
+              td {{p.annual_rate | ktPercent}}
+              td {{p.sustained}}
+              td {{p.due_at}}
+              td {{p.open_type}}
+              td {{p.consignee}}
+              td
+                a.link(@click="showInvestors(p)") {{p.investor_count}}
+      .pages
+        el-pagination(small, :current-page="query.page", :total="total_count", :page-size="query.per_page", layout="prev, pager, next, total, jumper", @current-change="pageChange")
+      investor-dialog(ref="investorDialog")
 
+</template>
 <script>
 import KtFilters from '../../../components/kt-filters.vue'
 import {
   Pagination,
   Loading
 } from 'element-ui'
+import InvestorDialog from './_investor_dialog.vue'
 import {
   registerProducts
 } from '../../../common/resources.js'
@@ -61,6 +66,7 @@ export default {
   mixins: [ProductMixin],
   components: {
     KtFilters,
+    InvestorDialog,
     ElPagination: Pagination
   },
 
@@ -76,18 +82,32 @@ export default {
         per_page: 15
       }, routeQuery)
 
-      let instLoading = Loading.service({
+      let loadingInstance = Loading.service({
         target: '.products-register .table'
       })
+
       let data = await registerProducts.get(this.query)
         .then(res => res.json())
         .catch(res => {
-          instLoading.close()
+          loadingInstance.close()
         })
 
       this.products = data.registered_products
       this.total_count = data.total_count
-      instLoading.close()
+      loadingInstance.close()
+    },
+
+    // 投资人列表
+    async showInvestors(product) {
+      let loadingInstance = Loading.service({
+        target: '.products-register .table'
+      })
+
+      await this.$refs.investorDialog.show(product).catch(() => {
+        loadingInstance.close()
+      })
+
+      loadingInstance.close()
     }
   },
 
@@ -124,6 +144,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import './products.scss';
 .products-register {
   .pages {
     text-align: center;

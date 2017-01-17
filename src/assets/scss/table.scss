@@ -71,6 +71,37 @@ table {
       }
       padding: 8px 5px;
     }
+    a {
+      &.link {
+        color: #18b8ba;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.el-dialog {
+  .table{
+    border-radius: 4px;
+  }
+  table {
+    thead {
+      th {
+        height: 30px;
+        font-size: 12px;
+        padding: 9px 5px;
+        text-align: center;
+      }
+    }
+    tbody {
+      td {
+        font-size: 12px;
+        color: #8e98a9;
+        text-align: center;
+      }
+    }
   }
 }
 
