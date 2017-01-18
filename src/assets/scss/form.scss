@@ -40,12 +40,12 @@ select {
     &[disabled],
     &.disabled {
       cursor: not-allowed;
-      color: darken(white, 10%);
-      background: lighten($primary_color, 10%)!important;
-      &:hover,
-      &:active {
-        background: lighten($primary_color, 10%)!important;
-      }
+      // color: darken(white, 10%);
+      // background: lighten($primary_color, 10%)!important;
+      // &:hover,
+      // &:active {
+      //   background: lighten($primary_color, 10%)!important;
+      // }
     }
   }
   &.kt-btn-gray {
@@ -61,12 +61,12 @@ select {
     &[disabled],
     &.disabled {
       cursor: not-allowed;
-      color: darken(white, 10%);
-      background: lighten($gray, 10%)!important;
-      &:hover,
-      &:active {
-        background: lighten($gray, 10%)!important;
-      }
+      // color: darken(white, 10%);
+      // background: lighten($gray, 10%)!important;
+      // &:hover,
+      // &:active {
+      //   background: lighten($gray, 10%)!important;
+      // }
     }
   }
 }

@@ -46,7 +46,7 @@ section.products
                 a.link(@click="showInvestors(p)") {{p.investor_count}}
       .pages
         el-pagination(small, :current-page="query.page", :total="total_count", :page-size="query.per_page", layout="prev, pager, next, total, jumper", @current-change="pageChange")
-      investor-dialog(ref="investorDialog")
+      investors-dialog(ref="investorsDialog")
 
 </template>
 <script>
@@ -55,7 +55,7 @@ import {
   Pagination,
   Loading
 } from 'element-ui'
-import InvestorDialog from './_investor_dialog.vue'
+import InvestorsDialog from './_investors_dialog.vue'
 import {
   registerProducts
 } from '../../../common/resources.js'
@@ -66,7 +66,7 @@ export default {
   mixins: [ProductMixin],
   components: {
     KtFilters,
-    InvestorDialog,
+    InvestorsDialog,
     ElPagination: Pagination
   },
 
@@ -99,15 +99,7 @@ export default {
 
     // 投资人列表
     async showInvestors(product) {
-      let loadingInstance = Loading.service({
-        target: '.products-register .table'
-      })
-
-      await this.$refs.investorDialog.show(product).catch(() => {
-        loadingInstance.close()
-      })
-
-      loadingInstance.close()
+      await this.$refs.investorsDialog.show(product)
     }
   },
 

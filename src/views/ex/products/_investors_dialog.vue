@@ -1,5 +1,5 @@
 <template lang="pug">
-  el-dialog(:title="investorsDialog.title", v-model="investorsDialog.show", size="tiny")
+  el-dialog.investors-dialog(:title="investorsDialog.title", v-model="investorsDialog.show", size="tiny")
     .table
       table
         colgroup
@@ -33,7 +33,8 @@
 
 <script>
 import {
-  Dialog
+  Dialog,
+  Loading
 } from 'element-ui'
 import {
   investors
@@ -46,12 +47,22 @@ export default {
 
   methods: {
     async show(product) {
+      let loadingInstance
+      this.investorsDialog.show = true
+      setTimeout(() => {
+        loadingInstance = Loading.service({
+          target: '.investors-dialog .el-dialog__body'
+        })
+      }, 10)
+
       let data = await investors.get({
         registered_product_id: product.id
-      }).then(res => res.json())
+      }).then(res => res.json()).catch(() => {
+        loadingInstance.close()
+      })
 
+      loadingInstance.close()
       this.investorsDialog.title = product.product_code
-      this.investorsDialog.show = true
       this.investorsDialog.investors = data.investors
     }
   },
@@ -69,9 +80,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .tbody-table{
-    max-height: 300px;
-    overflow-y: auto;
-    border-radius: 4px;
-  }
+.tbody-table {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 4px;
+}
 </style>

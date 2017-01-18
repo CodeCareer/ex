@@ -59,7 +59,7 @@
           h3 今日更新
             .update-data.fr(v-if="todayUpdateerror")
               span.update-status.status-column
-                i.icon-icomoon(:class="updated.update_status | updateStatusIcon")
+                i.icon-icomoon.dn(:class="updated.update_status | updateStatusIcon")
                 em {{updated.update_status}}
                 el-tooltip(effect="dark",placement="top")
                   .Prompt(slot="content") 已更新-本期更新数据已经传输和处理完毕 <br> 待更新-本期应该有更新数据但尚未开始传输 <br> 更新中-本期更新数据正在传输或处理中 <br> 异常-当前时间已经晚于数据更新的最晚截止时间但仍未传输或处理完毕
@@ -85,7 +85,7 @@
           .detailed-top-left.fl 全额结算
           .update-data.fr(v-if="todayQserror")
             span.update-status.status-column
-              i.icon-icomoon(:class="settlement.execute_status | excuteStatusIcon")
+              i.icon-icomoon.dn(:class="settlement.execute_status | excuteStatusIcon")
               em {{settlement.execute_status}}
               el-tooltip(effect="dark",placement="top")
                 .Prompt(slot="content") 待执行-清算数据正常可以进行清算执行操作确认<br> 不可执行-清算数据尚未更新或者异常导致无法执行清算确认 <br> 已执行-已经进行过清算执行操作确认 <br> 已过期-当前时间已经晚于需确认清算执行的最晚时限
@@ -194,7 +194,7 @@
                     a.link(@click="showInvestors(registeredProduct)") {{registeredProduct.investor_count}}
                 tr(v-if="!registeredProducts.length")
                   td(colspan="3").text-center 暂无数据
-    investor-dialog(ref="investorDialog")
+    investors-dialog(ref="investorsDialog")
 </template>
 
 <script>
@@ -207,7 +207,7 @@ import {
   Tooltip
 } from 'element-ui'
 import ktBarChart from '../../components/kt-bar-echart.vue'
-import InvestorDialog from './products/_investor_dialog.vue'
+import InvestorsDialog from './products/_investors_dialog.vue'
 import {
   essentialInformation,
   productLiquidation,
@@ -226,7 +226,7 @@ export default {
   mixins: [exMixin],
   components: {
     ktBarChart,
-    InvestorDialog,
+    InvestorsDialog,
     ElTooltip: Tooltip,
     ElDialog: Dialog
   },
@@ -241,14 +241,7 @@ export default {
 
     // 投资人列表
     async showInvestors(product) {
-      let loadingInstance = Loading.service({
-        target: '.stock-all-right .table-two'
-      })
-
-      await this.$refs.investorDialog.show(product).catch(() => {
-        loadingInstance.close()
-      })
-      loadingInstance.close()
+      await this.$refs.investorsDialog.show(product)
     },
 
     //产品基本信息
@@ -356,6 +349,7 @@ export default {
         virtual_asset_id: this.$route.params.id,
         ...this.registeredProductPages
       }).then(res => res.json()).then(data => {
+        if (!data.registered_products.length) this.$refs.dropDown.removeEventListener('scroll', this.onScroll)
         this.registeredProducts = this.registeredProducts.concat(data.registered_products)
         loadingInstance.close()
       }).catch(() => {
@@ -363,17 +357,21 @@ export default {
       })
     },
 
+    // 存量产品登记详情滚动事件
+    onScroll(ev) {
+      let dropdown = this.$refs.dropDown
+      if (dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 10) {
+        this.registeredProductPages.page += 1
+        this.registeredProductsGet()
+      }
+      ev.stopPropagation()
+    },
+
     //存量产品登记详情滚动事件初始化
     scrollInit() {
-      let dropdown = this.$refs.dropDown
-      let registeredProductPagesObj = this.registeredProductPages
-      dropdown.addEventListener('scroll', (ev) => {
-        if (dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 10) {
-          registeredProductPagesObj.page += 1
-          this.registeredProductsGet()
-        }
-        ev.stopPropagation()
-      })
+      this.registeredProductPages.page = 1
+      this.$refs.dropDown.removeEventListener('scroll', this.onScroll)
+      this.$refs.dropDown.addEventListener('scroll', this.onScroll)
     },
 
     //点击执行提交
@@ -393,6 +391,7 @@ export default {
               type: 'success',
               message: '执行成功'
             })
+            this.fetchAllData()
           })
         } else {
           Message({
@@ -402,6 +401,7 @@ export default {
         }
       })
     },
+    // 产品投向
     look() {
       if (this.virtualAsset.orientated_to) {
         MessageBox({
@@ -411,6 +411,27 @@ export default {
       } else {
         return
       }
+    },
+
+    fetchAllData() {
+      let productLoading = Loading.service({
+        target: '.content'
+      })
+
+      Promise.all([
+        this.essentialInformationGet(),
+        this.productLiquidationGet(),
+        this.updateGet(),
+        this.productStockGet(),
+        this.registeredProductsGet()
+        // this.feesGet()
+      ]).then(() => {
+        productLoading.close()
+      }).catch(() => {
+        productLoading.close()
+      })
+
+      this.scrollInit()
     }
     //单个产品的费用详情 暂时预留
     // feesGet() {
@@ -419,24 +440,7 @@ export default {
   },
 
   mounted() {
-    let productLoading = Loading.service({
-      target: '.content'
-    })
-
-    Promise.all([
-      this.essentialInformationGet(),
-      this.productLiquidationGet(),
-      this.updateGet(),
-      this.productStockGet(),
-      this.registeredProductsGet()
-      // this.feesGet()
-    ]).then(() => {
-      productLoading.close()
-    }).catch(() => {
-      productLoading.close()
-    })
-
-    this.scrollInit()
+    this.fetchAllData()
   },
 
   filters: {
