@@ -427,7 +427,7 @@ export default {
             // min: 0
         }],
         subscription_amount: [{
-          pattern: /^\d+(?:\.\d+)?(?:-\d+(?:\.\d+)?)?$/,
+          pattern: /^\d+$/,
           message: '请输入正整数'
             // type: 'integer',
             // min: 0
