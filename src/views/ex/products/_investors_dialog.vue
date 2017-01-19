@@ -3,20 +3,20 @@
     .table
       table
         colgroup
-          col(width='180')
-          col(width='250')
-          col(width='180')
+          col(width='40%')
+          col(width='40%')
+          col(width='20%')
         thead
           tr
             th.text-center 客户名称
-            th.text-right 持有金额（元）
+            th.text-right 持有金额 (元)
             th.text-right 占比
       div.tbody-table
         table
           colgroup
-            col(width='180')
-            col(width='250')
-            col(width='180')
+            col(width='40%')
+            col(width='40%')
+            col(width='20%')
           //- thead
             tr
               th 客户名称
