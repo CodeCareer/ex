@@ -96,7 +96,7 @@ export default {
     amendMenuActiveStatus(menus) {
       _.each(menus.$children, (v) => {
         if (v.route) {
-          v.$el.classList.toggle('is-active', _.startsWith(this.$route.path, this.menuActiveStatusMap[v.route.name]))
+          v.$el.className = _.startsWith(this.$route.path, this.menuActiveStatusMap[v.route.name]) ? 'el-menu-item is-active' : 'el-menu-item'
         }
 
         if (v.$children.length) {
