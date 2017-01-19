@@ -9,7 +9,7 @@
             el-form-item.el-input--xs(label="产品全称：", prop="name")
               el-input(placeholder='示例：京东丰银宝A', v-model="product.name")
             el-form-item.el-input--xs(label="销售平台：", prop="consignee_name")
-              el-autocomplete(v-model="product.consignee_name", :fetch-suggestions="queryConsigneeSearch", placeholder="如无意向平台，请填写「其它」或与我们联系", @select="handleConsigneeSelect")
+              el-autocomplete(v-model="product.consignee_name", :fetch-suggestions="queryConsigneeSearch", placeholder="请输入销售平台", @select="handleConsigneeSelect")
             el-form-item.el-input--xs(label="产品简称：", prop="product_short_name")
               el-input(placeholder='请输入产品简称', v-model="product.product_short_name")
             el-form-item.el-input--xs(label="产品代码：", prop="product_code")
@@ -217,16 +217,28 @@ export default {
             target: this.$refs.productForm.$el
           })
 
+          // hack上架日期和下架日期
+          let hackProduct = {
+            published_start_at: moment(this.product.published_start_at).format('YYYY-MM-DD') + ' 00:00:00',
+            published_end_at: moment(this.product.published_end_at).format('YYYY-MM-DD') + ' 23:59:59'
+          }
+
           let savePromise
           if (this.$route.params.id === 'new') { // 新建
             savePromise = productOne.save({
               action: 'create'
-            }, this.product)
+            }, {
+              ...this.product,
+              ...hackProduct
+            })
           } else {
             savePromise = productOne.update({ // 编辑
               virtual_asset_id: this.product.id,
               action: 'update'
-            }, this.product)
+            }, {
+              ...this.product,
+              ...hackProduct
+            })
           }
 
           savePromise.then(res => res.json()).then(data => {
@@ -286,8 +298,12 @@ export default {
     let validateCompareDate = (rule, value, cb) => {
       if (rule.lt && moment(value).toDate() >= moment(_.get(_self, rule.lt)).toDate()) {
         cb(new Error(`要求小于${rule.ltFieldName}`))
+      } else if (rule.lte && moment(value).toDate() > moment(_.get(_self, rule.lte)).toDate()) {
+        cb(new Error(`要求小于等于${rule.lteFieldName}`))
       } else if (rule.gt && moment(value).toDate() <= moment(_.get(_self, rule.gt)).toDate()) {
         cb(new Error(`要求大于${rule.gtFieldName}`))
+      } else if (rule.gte && moment(value).toDate() < moment(_.get(_self, rule.gte)).toDate()) {
+        cb(new Error(`要求大于等于${rule.gteFieldName}`))
       } else {
         cb()
       }
@@ -433,14 +449,14 @@ export default {
             // min: 0
         }],
         published_start_at: [{
-          lt: 'product.published_end_at',
-          ltFieldName: '下架日期',
+          lte: 'product.published_end_at',
+          lteFieldName: '下架日期',
           validator: validateCompareDate
         }],
         published_end_at: [{
-          gt: 'product.published_start_at',
+          gte: 'product.published_start_at',
           lt: 'product.value_at',
-          gtFieldName: '上架日期',
+          gteFieldName: '上架日期',
           ltFieldName: '起息日',
           validator: validateCompareDate
         }],
