@@ -213,7 +213,7 @@ export default {
     },
     //查找各平台的chart
     goTrend(platform) {
-      this.collectivityChart(this.balanceTrends.find(v => v.consignee === platform).data)
+      this.collectivityChart(_.find(this.balanceTrends, v => v.consignee === platform).data)
       this.stockName = platform
     },
     // 存量产品金额波动趋势
