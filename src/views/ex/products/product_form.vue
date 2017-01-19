@@ -149,7 +149,7 @@ export default {
   methods: {
     // 机构名称实时筛选
     queryConsigneeSearch(queryString, cb) {
-      var results = queryString ? this.consignees.filter(v => v.value.includes(queryString)) : []
+      var results = queryString ? _.filter(this.consignees, v => _.includes(v.value, queryString)) : []
 
       // 调用 callback 返回建议列表的数据
       cb(results)
@@ -163,7 +163,7 @@ export default {
 
     // 结算时间实时筛选
     querySDMinutesSearch(queryString, cb) {
-      var results = queryString ? this.sdMinutes.filter(v => v.value.includes(queryString)) : this.sdMinutes
+      var results = queryString ? _.filter(this.sdMinutes, v => _.includes(v.value, queryString)) : this.sdMinutes
       cb(results)
     },
 
