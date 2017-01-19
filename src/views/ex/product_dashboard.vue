@@ -96,7 +96,7 @@
         .detailed-middle
           ul
             li
-              span 用户名:
+              span 账户名:
               em {{virtualAsset.consignee_bank_account_name | ktNull}}
             li
               span 账 &nbsp &nbsp户:

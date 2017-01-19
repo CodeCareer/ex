@@ -37,7 +37,7 @@ export default {
         formatter: (params, ticket, callback) => {
           if (!params.length) return
           return _.concat([`<table class="chart-tooltip"><tr><th colspan="2">${params[0].name}</th><tr>`],
-            params.map(v => {
+            _.map(params, v => {
               return `<tr class="line">
                         <td class="left"><i class="circle" style="color:${v.color}"></i>${v.seriesName}：</td>
                         <td class="right">${Vue.filter('ktCurrency')(v.value)}</td>

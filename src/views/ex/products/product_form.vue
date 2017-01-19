@@ -287,7 +287,7 @@ export default {
     let validateConsignee = (rule, value, cb) => {
       if (value === '') {
         cb(new Error('请填写机构'))
-      } else if (!this.consignees.some(v => v.value === value)) {
+      } else if (!_.some(this.consignees, v => v.value === value)) {
         cb(new Error('请按提示选择相应机构'))
       } else {
         cb()
@@ -328,8 +328,8 @@ export default {
       }
     }
 
-    let sdMinutes = _.flatten(_.range(24).map(vh => {
-      return _.range(4).map(vm => {
+    let sdMinutes = _.flatten(_.map(_.range(24), vh => {
+      return _.map(_.range(4), vm => {
         return {
           value: moment(`${vh}:${vm * 15}`, 'H:mm').format('HH:mm')
         }

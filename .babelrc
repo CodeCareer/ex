@@ -1,6 +1,8 @@
 {
   "presets": ["es2015", "stage-2"],
-  "plugins": ["transform-runtime", ["component", [
+  "plugins": [["transform-runtime", {
+    "moduleName": "babel-runtime"
+  }], ["component", [
     {
       "libraryName": "element-ui",
       "styleLibraryName": "theme-default"

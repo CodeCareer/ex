@@ -99,7 +99,7 @@
                   td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
                     span {{product.net_cash_flow >= 0 ? '净流入' : '净流出'}}
                       em(:class="[product.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
-                  td
+                  //- td
                   td.implement.status-column
                     i.icon-icomoon(:class="product.update_status | updateStatusIcon")
                     em.em-implement {{product.update_status}}

@@ -35,7 +35,7 @@ export default {
     })
 
     Vue.filter('ktRound', (value, decimal = 0) => {
-      return _.round(value, decimal)
+      return _.round(value, decimal).toFixed(2)
     })
 
     Vue.filter('ktAppend', (value, str) => {

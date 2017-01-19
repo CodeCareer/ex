@@ -42,7 +42,7 @@ export default [
       } else if (res.status === 400) {
         MessageBox.alert(res.body.error || res.body.errors || '请求失败！', '提示', alertOpt)
       } else if (res.status === 403) {
-        MessageBox.alert(res.body.error || res.body.errors || '您无此权限', '提示', alertOpt)
+        MessageBox.alert(res.body.error || res.body.errors || '您无此权限！', '提示', alertOpt)
       } else if (res.status === 500 || res.status === 502) { // 注释掉是为了接部分接口
         MessageBox.alert('抱歉！服务器忙。', '提示', alertOpt)
       } else if (res.status === 200) {
