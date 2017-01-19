@@ -20,6 +20,12 @@ table {
       &.text-center {
         text-align: center;
       }
+      &.text-left {
+        text-align: left;
+      }
+      &.text-right {
+        text-align: right;
+      }
       &.order-column {
         cursor: pointer;
         &.active {
@@ -73,6 +79,12 @@ table {
       &.text-center {
         text-align: center;
       }
+      &.text-right {
+        text-align: right;
+      }
+      &.text-left {
+        text-align: left;
+      }
       padding: 8px 5px;
     }
     a {
@@ -98,14 +110,14 @@ table {
         height: 30px;
         font-size: 12px;
         padding: 9px 5px;
-        text-align: center;
+        // text-align: center;
       }
     }
     tbody {
       td {
         font-size: 12px;
         color: #8e98a9;
-        text-align: center;
+        // text-align: center;
       }
     }
   }
@@ -119,7 +131,7 @@ table {
     margin-bottom: 20px;
     .table-body {
       max-height: 350px;
-      overflow-y: auto;
+      overflow-y: scroll;
     }
   }
   table {
@@ -172,7 +184,7 @@ table {
               cursor: pointer;
             }
             &:first-of-type {
-              width: 290px;
+              width: 220px;
               text-align: left;
               text-indent: 10px;
             }

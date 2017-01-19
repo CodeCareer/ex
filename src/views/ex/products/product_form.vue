@@ -350,19 +350,19 @@ export default {
         value: '2'
       }],
       riskLevelOptions: [{ // 风险等级
-        label: '低',
+        label: '低风险',
         value: 'L'
       }, {
-        label: '较低',
+        label: '较低风险',
         value: 'ML'
       }, {
-        label: '中',
+        label: '中风险',
         value: 'M'
       }, {
-        label: '较高',
+        label: '较高风险',
         value: 'MH'
       }, {
-        label: '高',
+        label: '高风险',
         value: 'H'
       }],
       consignees: [],

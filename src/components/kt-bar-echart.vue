@@ -29,7 +29,7 @@ export default {
         formatter: (params, ticket, callback) => {
           if (!params.length) return
           return _.concat([`<table class="chart-tooltip"><tr><th colspan="2">${params[0].name}</th><tr>`],
-            params.map(v => {
+            _.map(params, v => {
               return `<tr class="line">
                         <td class="left"><i class="circle" style="color:${v.color}"></i>${v.seriesName}：</td>
                         <td class="right">${Vue.filter('ktCurrency')(v.value)}</td>
@@ -42,9 +42,11 @@ export default {
         // x: '20px',
         // left: '0px',
         // y: '280px',
+        itemWidth: 15,
+        itemHeight: 10,
         bottom: 20,
         data: [],
-        itemwidth: 10, //示例图标宽度
+        // itemwidth: 10, //示例图标宽度
         textStyle: {
           fontSize: 12, //示例文字size
           color: '#262c38' //示例文字颜色

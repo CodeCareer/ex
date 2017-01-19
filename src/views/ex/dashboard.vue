@@ -99,7 +99,7 @@
                   td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
                     span {{product.net_cash_flow >= 0 ? '净流入' : '净流出'}}
                       em(:class="[product.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
-                  //- td
+                  td
                   td.implement.status-column
                     i.icon-icomoon(:class="product.update_status | updateStatusIcon")
                     em.em-implement {{product.update_status}}
@@ -263,37 +263,39 @@ export default {
           series: [{
             name: '申购',
             type: 'line',
-            barWidth: 50,
-            barGap: 50,
             data: _.map(data.fund_trends, v => v.subscription),
-            color: ['#424853']
+            color: ['#424853'],
+            symbolSize: 6,
+            symbol: 'circle'
           }, {
             name: '到期',
             type: 'line',
             data: _.map(data.fund_trends, v => v.settlement),
             color: ['#19b8bc'],
-            symbolSize: 10,
+            symbolSize: 6,
             symbol: 'circle'
           }, {
             name: '赎回',
             type: 'line',
             data: _.map(data.fund_trends, v => v.redeemed),
             color: ['#41a5d7'],
-            symbolSize: 10,
+            symbolSize: 6,
             symbol: 'circle'
           }, {
             name: '发行',
             type: 'line',
             data: _.map(data.fund_trends, v => v.issurance),
             color: ['#ad74d5'],
-            symbolSize: 10,
+            symbolSize: 6,
             symbol: 'circle'
           }, {
             name: '净现金流',
             type: 'bar',
             data: _.map(data.fund_trends, v => v.net_cash_flow),
             color: ['#d1d2d4'],
-            symbolSize: 10,
+            symbolSize: 6,
+            barMaxWidth: 50,
+            // barGap: 50,
             symbol: 'circle'
           }]
         })
@@ -352,11 +354,11 @@ export default {
       stockChartOption: {
         legend: {
           data: [{
-            name: '存续本金',
-            icon: 'circle' //示例图标设为圆形
+            name: '存续本金'
+            // icon: 'circle' //示例图标设为圆形
           }, {
-            name: '存续利息',
-            icon: 'circle'
+            name: '存续利息'
+            // icon: 'circle'
           }]
         },
         xAxis: {

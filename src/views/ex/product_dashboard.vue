@@ -305,11 +305,11 @@ export default {
         this.stockChartOption = _.merge({}, this.stockChartOption, {
           legend: {
             data: [{
-              name: '存续本金',
-              icon: 'circle' //示例图标设为圆形
+              name: '存续本金'
+              // icon: 'circle' //示例图标设为圆形
             }, {
-              name: '存续利息',
-              icon: 'circle'
+              name: '存续利息'
+              // icon: 'circle'
             }]
           },
           xAxis: [{

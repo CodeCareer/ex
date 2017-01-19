@@ -43,8 +43,8 @@ export default {
           fontSize: 12, //示例文字size
           color: '#262c38' //示例文字颜色
         },
-        itemWidth: 16,
-        itemHeight: 16,
+        itemWidth: 15,
+        itemHeight: 10,
         itemGap: 20
       },
       series: [{

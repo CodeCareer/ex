@@ -3,9 +3,11 @@
   .buttons-topbar {
     // position: absolute;
     // top: 0;
-    line-height: 35px;
     // right: 10px;
+    line-height: 35px;
     text-align: right;
+    margin-top: -38px;
+    margin-bottom: 5px;
   }
   .el-tabs {
     vertical-align: top;

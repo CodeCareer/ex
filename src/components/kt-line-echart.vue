@@ -26,6 +26,8 @@ export default {
     this.echart = echarts.init(this.$refs.lineEchart)
     var option = {
       legend: {
+        itemWidth: 10,
+        itemHeight: 10,
         itemGap: 20,
         textStyle: {
           color: '#262c38',

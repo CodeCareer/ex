@@ -54,7 +54,7 @@ export default {
     })
 
     Vue.filter('ktNull', (value, str) => {
-      return value || str || '-'
+      return _.isNull(value) ? '-' : (str || value)
     })
 
     Vue.filter('moment', (date, format) => {

@@ -8,9 +8,9 @@
           col(width='180')
         thead
           tr
-            th 客户名称
-            th 持有金额（元）
-            th 占比
+            th.text-center 客户名称
+            th.text-right 持有金额（元）
+            th.text-right 占比
       div.tbody-table
         table
           colgroup
@@ -24,11 +24,11 @@
               th 占比
           tbody
             tr(v-if="investorsDialog.investors.length", v-for="investor in investorsDialog.investors")
-              td {{investor.name}}
-              td {{investor.price | ktRound(2)}}
-              td {{investor.percentage | ktPercent}}
+              td.text-center {{investor.name}}
+              td.text-right {{investor.price | ktRound(2)}}
+              td.text-right {{investor.percentage | ktPercent}}
             tr(v-if="!investorsDialog.investors.length")
-              td(colspan="3") 无客户信息
+              td.text-center(colspan="3") 无客户信息
 </template>
 
 <script>
