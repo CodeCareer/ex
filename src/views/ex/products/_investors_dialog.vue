@@ -1,21 +1,24 @@
 <template lang="pug">
-  el-dialog.investors-dialog(:title="investorsDialog.title", v-model="investorsDialog.show", size="tiny")
+  el-dialog.investors-dialog(:title="investorsDialog.title", v-model="investorsDialog.show", size="small")
     .table
       table
         colgroup
+          col(width='20%')
           col(width='40%')
-          col(width='40%')
+          col(width='20%')
           col(width='20%')
         thead
           tr
             th.text-center 客户名称
+            th.text-center 身份证号
             th.text-right 持有金额 (元)
             th.text-right 占比
       div.tbody-table
         table
           colgroup
+            col(width='20%')
             col(width='40%')
-            col(width='40%')
+            col(width='20%')
             col(width='20%')
           //- thead
             tr
@@ -25,6 +28,7 @@
           tbody
             tr(v-if="investorsDialog.investors.length", v-for="investor in investorsDialog.investors")
               td.text-center {{investor.name}}
+              td.text-center {{investor.identity_id}}
               td.text-right {{investor.price | ktRound(2)}}
               td.text-right {{investor.percentage | ktPercent}}
             tr(v-if="!investorsDialog.investors.length")
