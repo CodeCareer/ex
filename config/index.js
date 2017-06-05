@@ -24,7 +24,7 @@ module.exports = {
     proxyTable: {
       '/internal/api': {
         // target: 'http://liuxiangrmbp.local:3000',
-        target: 'http://opt-baton.ktjr.com',
+        target: 'http://baton.ktjr.com',
         changeOrigin: true
           // pathRewrite: {
           //   '^/api': ''

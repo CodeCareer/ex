@@ -6,7 +6,7 @@ import App from './App.vue'
 import store from './vuex/store.js'
 Vue.use(VueRouter)
 
-let router = new VueRouter({
+const router = new VueRouter({
   mode: 'history',
   base: __dirname,
   scrollBehavior(to, from, savedPosition) {
