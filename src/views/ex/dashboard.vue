@@ -20,9 +20,9 @@
           kt-pie-echart(:chart-option="pieChartOption")
 
     .today-square
-      h2 今日清算
+      h2 近期清算
         el-tooltip(effect="dark",placement="right")
-          .Prompt(slot="content") 展示今日需资金清算的所有产品，包括今日流入资金的入账确认以及今日流出资金的划款确认 <br> 待执行-清算数据正常可以进行清算执行操作确认 <br> 不可执行-清算数据尚未更新或者异常导致无法执行清算确认 <br> 已执行-已经进行过清算执行操作确认 <br> 已过期-当前时间已经晚于需确认清算执行的最晚时限
+          .Prompt(slot="content") 展示近5个工作日需资金清算的所有产品，包括近5个工作日流入资金的入账确认以及近5日流出资金的划款确认 <br> 待执行-清算数据正常可以进行清算执行操作确认<br> 不可执行-清算数据尚未更新或者异常导致无法执行清算确认 <br> 已执行-已经进行过清算执行操作确认 <br> 已过期-当前时间已经晚于需确认清算执行的最晚时限
           i(class="icon-icomoon icon-explain")
         .information.fr
           span {{summary.executed}}
@@ -34,35 +34,42 @@
           span {{summary.expired}}
           em 条 已过期
       .overview-table
-        .table-container(v-for="(item,key) in virtualAssets")
+        .table-container(v-for="(item,key) in virtualAssets", v-if="item.data.length")
           table
             thead
               tr
-                th {{key}}
+                th {{item.date}}
                 th
           .table-body
             table
-              tbody(v-for="product in item")
+              tbody(v-for="product in item.data")
                 tr(@click="toDetails(product)")
-                  td(:title="product.name")
-                    span {{product.name}}
-                  td(:title="product.inflow | ktCurrency")
-                    span(v-if="product.inflow_desc") {{product.inflow_desc}}
-                      em.red-color {{product.inflow | ktCurrency}}
-                  td(:title="product.outflow | ktCurrency")
-                    span(v-if="product.outflow_desc") {{product.outflow_desc}}
-                      em.green-color {{product.outflow | ktCurrency}}
-                  td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
-                    span {{product.net_cash_flow >= 0 ? '净流入' : '净流出'}}
-                      em(:class="[product.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
+                  td(:title="product.consignee",:rowspan="product.data.length")
+                    span {{product.consignee}}
                   td
-                    span.bg-color {{product.execute_method}}
-                  td.implement.status-column
-                    i.icon-icomoon(:class="product.execute_status | excuteStatusIcon")
-                    em.em-implement {{product.execute_status}}
-                  td
-                    span(v-show="product.execute_status === '待执行' ? true : false") 结算时限:
-                      em {{product.due_at}}
+                    table
+                      tbody
+                        tr.first_trn(v-for="data in product.data")
+                          td(:title="data.name | ktCurrency")
+                            span(v-if="data.name") {{data.name}}
+                              em.red-color {{product.inflow | ktCurrency}}
+                          td(:title="data.inflow | ktCurrency")
+                            span(v-if="data.inflow_desc") {{data.inflow_desc}}
+                              em.red-color {{data.inflow | ktCurrency}}
+                          td(:title="data.outflow | ktCurrency")
+                            span(v-if="data.outflow_desc") {{data.outflow_desc}}
+                              em.green-color {{data.outflow | ktCurrency}}
+                          td(:title="data.net_cash_flow | ktFlow  | ktCurrency")
+                            span {{data.net_cash_flow >= 0 ? '净流入' : '净流出'}}
+                              em(:class="[data.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{data.net_cash_flow | ktFlow | ktCurrency }}
+                          td
+                            span.bg-color {{data.execute_method}}
+                          td.implement.status-column
+                            i.icon-icomoon(:class="data.execute_status | excuteStatusIcon")
+                            em.em-implement {{data.execute_status}}
+                          td
+                            span(v-show="data.execute_status === '待执行' ? true : false") 结算时限:
+                              em {{data.due_at}}
     .today-square
       h2 今日更新
         el-tooltip(effect="dark",placement="right")
@@ -78,34 +85,42 @@
           span {{updateSummary.abnormal}}
           em 条 异常
       .overview-table
-        .table-container(v-for="(item,key) in updateVas")
+        .table-container(v-for="(item,key) in updateAssets", v-if="item.data.length")
           table
             thead
               tr
-                th {{key}}
+                th {{item.date}}
                 th
           .table-body
             table
-              tbody(v-for="product in item")
+              tbody(v-for="product in item.data")
                 tr(@click="toDetails(product)")
-                  td(:title="product.name")
-                    span {{product.name}}
-                  td(:title="product.inflow | ktCurrency")
-                    span(v-if="product.inflow_desc") {{product.inflow_desc}}
-                      em.red-color {{product.inflow | ktCurrency}}
-                  td(:title="product.outflow | ktCurrency")
-                    span(v-if="product.outflow_desc") {{product.outflow_desc}}
-                      em.green-color {{product.outflow | ktCurrency}}
-                  td(:title="product.net_cash_flow | ktFlow  | ktCurrency")
-                    span {{product.net_cash_flow >= 0 ? '净流入' : '净流出'}}
-                      em(:class="[product.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{product.net_cash_flow | ktFlow | ktCurrency }}
+                  td(:title="product.consignee",:rowspan="product.data.length")
+                    span {{product.consignee}}
                   td
-                  td.implement.status-column
-                    i.icon-icomoon(:class="product.update_status | updateStatusIcon")
-                    em.em-implement {{product.update_status}}
-                  td
-                    span(v-show="product.update_status === '已更新' ? true : false") 更新时间:
-                      em {{product.updated_at}}
+                    table
+                      tbody
+                        tr.first_trn(v-for="data in product.data")
+                          td(:title="data.name | ktCurrency")
+                            span(v-if="data.name") {{data.name}}
+                              em.red-color {{product.inflow | ktCurrency}}
+                          td(:title="data.inflow | ktCurrency")
+                            span(v-if="data.inflow_desc") {{data.inflow_desc}}
+                              em.red-color {{data.inflow | ktCurrency}}
+                          td(:title="data.outflow | ktCurrency")
+                            span(v-if="data.outflow_desc") {{data.outflow_desc}}
+                              em.green-color {{data.outflow | ktCurrency}}
+                          td(:title="data.net_cash_flow | ktFlow  | ktCurrency")
+                            span {{data.net_cash_flow >= 0 ? '净流入' : '净流出'}}
+                              em(:class="[data.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{data.net_cash_flow | ktFlow | ktCurrency }}
+                          td
+                            span.bg-color {{data.execute_method}}
+                          td.implement.status-column
+                            i.icon-icomoon(:class="data.execute_status | excuteStatusIcon")
+                            em.em-implement {{data.execute_status}}
+                          td
+                            span(v-show="data.execute_status === '待执行' ? true : false") 结算时限:
+                              em {{data.due_at}}
     .today-square
       h2 趋势图
       .trend-chart
@@ -119,7 +134,7 @@
         .trend-stock.fr
           h3 交易所近期资金流动趋势
           .capital-chart
-            kt-line-chart(:chart-option="lineChartOption")
+            //- kt-line-chart(:chart-option="lineChartOption")
 </template>
 
 <script>
@@ -253,6 +268,7 @@ export default {
     //近期资金流动趋势
     capitalTrendGet() {
       return capitalTrend.get().then(res => res.json()).then(data => {
+        debugger
         this.lineChartOption = _.merge({}, this.lineChartOption, {
           legend: {
             data: ['申购', '到期', '赎回', '发行', '净现金流']
@@ -305,7 +321,7 @@ export default {
     liquidationGet() {
       return liquidation.get().then(res => res.json()).then(data => {
         this.summary = data.summary
-        this.virtualAssets = _.groupBy(data.virtual_assets, v => v.consignee)
+        this.virtualAssets = data.virtual_assets
       })
     },
 
@@ -316,7 +332,7 @@ export default {
         per_page: 100
       }).then(res => res.json()).then(data => {
         this.updateSummary = data.summary
-        this.updateVas = _.groupBy(data.virtual_assets, v => v.consignee)
+        this.updateAssets = data.virtual_assets
       })
     }
   },
@@ -347,6 +363,7 @@ export default {
       lineChartOption: {},
       summary: '',
       virtualAssets: '',
+      updateAssets: '',
       updateSummary: '',
       updateVas: '',
       stocktrends: '',
@@ -355,10 +372,10 @@ export default {
         legend: {
           data: [{
             name: '存续本金'
-            // icon: 'circle' //示例图标设为圆形
+              // icon: 'circle' //示例图标设为圆形
           }, {
             name: '存续利息'
-            // icon: 'circle'
+              // icon: 'circle'
           }]
         },
         xAxis: {
@@ -500,6 +517,12 @@ export default {
       em {
         font-style: normal;
       }
+    }
+  }
+  .first_trn {
+    border-bottom: 1px solid #b4becf;
+    &:last-child {
+      border-bottom: none;
     }
   }
 }

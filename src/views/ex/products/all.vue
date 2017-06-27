@@ -1,6 +1,7 @@
 <template lang="pug">
   .products-all
     kt-filters(:conditions='filters')
+    .filter-mes(v-if="captionMes") {{captionMes}}
     .table
       table
         thead
@@ -18,6 +19,11 @@
                 i.icon-icomoon.icon-arrow-top.desc
             th.order-column(:class='[{active: query.sort_by === "sustained"}, query.order]', @click='sortBy("sustained")')
               | 期限
+              span.icon-order-group
+                i.icon-icomoon.icon-arrow-top.asc
+                i.icon-icomoon.icon-arrow-top.desc
+            th.order-column(:class="[{active: query.sort_by === 'interest'}, query.order]", @click="sortBy('interest')")
+              | 起息日
               span.icon-order-group
                 i.icon-icomoon.icon-arrow-top.asc
                 i.icon-icomoon.icon-arrow-top.desc
@@ -47,6 +53,7 @@
             td {{p.balance | ktCurrency}}
             td {{p.annual_rate | ktPercent | ktNull}}
             td {{p.sustained | ktNull}}
+            td {{p.value_at | ktNull}}
             td {{p.due_at | ktNull}}
             td {{p.open_type | ktNull}}
             td {{p.consignee | ktNull}}
@@ -109,7 +116,7 @@ export default {
         .catch(res => {
           this.instLoading.close()
         })
-
+      this.captionMes = data.caption
       this.products = data.virtual_assets
       this.total_count = data.total_count
       this.instLoading.close()
@@ -118,6 +125,7 @@ export default {
 
   data() {
     return {
+      captionMes: '',
       filters: [
         [{
           name: '产品名称',
@@ -127,6 +135,28 @@ export default {
           name: '发行平台',
           type: 'input',
           key: 'consignee'
+        }, {
+          name: '日期筛选',
+          type: 'select',
+          key: 'date_type',
+          date: true,
+          options: [{
+            name: '全部',
+            selected: true,
+            value: 'ALL'
+          }, {
+            name: '起息日',
+            value: 'VALUE_AT'
+          }, {
+            name: '到期日',
+            value: 'DUE_AT'
+          }]
+        }, {
+          key: 'start_date',
+          value: 'null'
+        }, {
+          key: 'end_date',
+          value: 'null'
         }],
         [{
           name: '产品类型',
@@ -189,6 +219,14 @@ export default {
     text-align: center;
     padding: 32px 0;
     margin-bottom: -90px;
+  }
+}
+.filter-mes{
+  margin:10px 0;
+  font-size:13px;
+  em{
+    padding:0 3px;
+    color:#18b8ba;
   }
 }
 </style>

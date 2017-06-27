@@ -9,6 +9,8 @@
           select(v-model='query[item.key]', :class='{"no-valid-value": query[item.key] === "null"}', @change.prevent='search()')
             option(v-for='o in item.options', :value='o.value || o.name') {{o.name}}
           i.icon-icomoon.icon-select-down
+          span(v-if="item.date")
+            el-date-picker(placeholder="选择日期范围", type="daterange",v-model="dateValue", @change="dateChange")
     section.buttons
       button.kt-btn.kt-btn-primary(@click='search()')
         i.icon-icomoon.icon-search
@@ -17,13 +19,20 @@
 </template>
 
 <script>
+import {
+  DatePicker
+} from 'element-ui'
 import _ from 'lodash'
+import moment from 'moment'
 let defaultQuery = {
   page: 1,
   per_page: 15
 }
 
 export default {
+  components: {
+    ElDatePicker: DatePicker
+  },
   props: {
     conditions: { // 命名为filters的时候会无法收到初始化传值，很奇怪
       type: Array,
@@ -71,6 +80,17 @@ export default {
     update() {
       let query = updateQuery.call(this)
       this.query = query
+    },
+
+    dateChange() {
+      if (this.dateValue[0] !== null) {
+        this.query.start_date = moment(this.dateValue[0]).format('YYYY-MM-DD')
+        this.query.end_date = moment(this.dateValue[1]).format('YYYY-MM-DD')
+      } else {
+        this.query.start_date = null
+        this.query.end_date = null
+      }
+      this.search()
     }
   },
 
@@ -86,6 +106,7 @@ export default {
     let query = updateQuery.call(this)
 
     return {
+      dateValue: '',
       query: query
     }
   }
@@ -99,7 +120,6 @@ function updateQuery() {
   _.each(_.flattenDeep(this.conditions), v => {
     query[v.key] = params[v.key] || (v.type === 'select' ? (v.options[0].value || v.options[0].name) : null)
   })
-
   return query
 }
 </script>
@@ -171,6 +191,26 @@ function updateQuery() {
     position: absolute;
     bottom: 10px;
     right: 10px;
+  }
+}
+
+.el-date-editor--daterange.el-input {
+  width: 220px;
+  margin-left: 20px;
+  vertical-align: 1px;
+  input {
+    width: 200px;
+    height: 26px;
+    border-color: none;
+    &:hover {
+      border-color: none;
+    }
+  }
+  .el-input__icon {
+    right: 20px;
+  }
+  .el-input__inner:hover {
+    border-color: none;
   }
 }
 </style>
