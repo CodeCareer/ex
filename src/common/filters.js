@@ -58,7 +58,6 @@ export default {
     })
 
     Vue.filter('moment', (date, format) => {
-      debugger
       return moment(date).format(format)
     })
   }

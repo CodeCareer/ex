@@ -37,7 +37,6 @@ export default {
       tooltip: {
         trigger: 'axis',
         formatter: (params, ticket, callback) => {
-          debugger
           if (!params.length) return
           return _.concat([`<table class="chart-tooltip"><tr><th colspan="2">${params[0].name}</th><tr>`],
             _.map(params, v => {
@@ -84,7 +83,8 @@ export default {
         left: 100,
         right: 20,
         bottom: 60
-      }
+      },
+      series: []
     }
 
     this.echart.setOption(_.merge({}, option, this.chartOption))

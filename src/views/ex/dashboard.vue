@@ -134,7 +134,7 @@
         .trend-stock.fr
           h3 交易所近期资金流动趋势
           .capital-chart
-            //- kt-line-chart(:chart-option="lineChartOption")
+            kt-line-chart(:chart-option="lineChartOption")
 </template>
 
 <script>
@@ -267,47 +267,46 @@ export default {
     },
     //近期资金流动趋势
     capitalTrendGet() {
-      return capitalTrend.get().then(res => res.json()).then(data => {
-        debugger
+      return capitalTrend.get().then(res => res.json()).then(res => {
         this.lineChartOption = _.merge({}, this.lineChartOption, {
           legend: {
             data: ['申购', '到期', '赎回', '发行', '净现金流']
           },
           xAxis: {
-            data: _.map(data.fund_trends, v => moment(v.date).format('MM-DD'))
+            data: _.map(res.fund_trends, v => moment(v.date).format('MM-DD'))
           },
           series: [{
             name: '申购',
             type: 'line',
-            data: _.map(data.fund_trends, v => v.subscription),
+            data: _.map(res.fund_trends, v => v.subscription),
             color: ['#424853'],
             symbolSize: 6,
             symbol: 'circle'
           }, {
             name: '到期',
             type: 'line',
-            data: _.map(data.fund_trends, v => v.settlement),
+            data: _.map(res.fund_trends, v => v.settlement),
             color: ['#19b8bc'],
             symbolSize: 6,
             symbol: 'circle'
           }, {
             name: '赎回',
             type: 'line',
-            data: _.map(data.fund_trends, v => v.redeemed),
+            data: _.map(res.fund_trends, v => v.redeemed),
             color: ['#41a5d7'],
             symbolSize: 6,
             symbol: 'circle'
           }, {
             name: '发行',
             type: 'line',
-            data: _.map(data.fund_trends, v => v.issurance),
+            data: _.map(res.fund_trends, v => v.issurance),
             color: ['#ad74d5'],
             symbolSize: 6,
             symbol: 'circle'
           }, {
             name: '净现金流',
             type: 'bar',
-            data: _.map(data.fund_trends, v => v.net_cash_flow),
+            data: _.map(res.fund_trends, v => v.net_cash_flow),
             color: ['#d1d2d4'],
             symbolSize: 6,
             barMaxWidth: 50,
