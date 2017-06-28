@@ -116,8 +116,8 @@
                           td
                             span.bg-color(v-if="data.execute_method") {{data.execute_method}}
                           td.implement.status-column
-                            i.icon-icomoon(:class="data.execute_status | excuteStatusIcon")
-                            em.em-implement {{data.execute_status}}
+                            i.icon-icomoon(:class="data.update_status | updateStatusIcon")
+                            em.em-implement {{data.update_status}}
                           td
                             span(v-show="data.execute_status === '待执行' ? true : false") 结算时限:
                               em {{data.due_at}}
