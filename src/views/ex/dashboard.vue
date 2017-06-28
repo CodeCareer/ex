@@ -43,27 +43,27 @@
           .table-body
             table
               tbody(v-for="product in item.data")
-                tr(@click="toDetails(product)")
+                tr
                   td(:title="product.consignee",:rowspan="product.data.length")
                     span {{product.consignee}}
                   td
                     table
                       tbody
-                        tr.first_trn(v-for="data in product.data")
-                          td(:title="data.name | ktCurrency")
+                        tr.first_trn(v-for="data in product.data",@click="toDetails(data)")
+                          td.first_tdn(:title="data.name | ktCurrency")
                             span(v-if="data.name") {{data.name}}
                               em.red-color {{product.inflow | ktCurrency}}
-                          td(:title="data.inflow | ktCurrency")
+                          td.minW(:title="data.inflow | ktCurrency")
                             span(v-if="data.inflow_desc") {{data.inflow_desc}}
                               em.red-color {{data.inflow | ktCurrency}}
-                          td(:title="data.outflow | ktCurrency")
+                          td.minW(:title="data.outflow | ktCurrency")
                             span(v-if="data.outflow_desc") {{data.outflow_desc}}
                               em.green-color {{data.outflow | ktCurrency}}
-                          td(:title="data.net_cash_flow | ktFlow  | ktCurrency")
+                          td.minW(:title="data.net_cash_flow | ktFlow  | ktCurrency")
                             span {{data.net_cash_flow >= 0 ? '净流入' : '净流出'}}
                               em(:class="[data.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{data.net_cash_flow | ktFlow | ktCurrency }}
                           td
-                            span.bg-color {{data.execute_method}}
+                            span.bg-color(v-if="data.execute_method") {{data.execute_method}}
                           td.implement.status-column
                             i.icon-icomoon(:class="data.execute_status | excuteStatusIcon")
                             em.em-implement {{data.execute_status}}
@@ -94,27 +94,27 @@
           .table-body
             table
               tbody(v-for="product in item.data")
-                tr(@click="toDetails(product)")
+                tr
                   td(:title="product.consignee",:rowspan="product.data.length")
                     span {{product.consignee}}
                   td
                     table
                       tbody
-                        tr.first_trn(v-for="data in product.data")
-                          td(:title="data.name | ktCurrency")
+                        tr.first_trn(v-for="data in product.data",@click="toDetails(data)")
+                          td.first_tdn(:title="data.name | ktCurrency")
                             span(v-if="data.name") {{data.name}}
                               em.red-color {{product.inflow | ktCurrency}}
-                          td(:title="data.inflow | ktCurrency")
+                          td.minW(:title="data.inflow | ktCurrency")
                             span(v-if="data.inflow_desc") {{data.inflow_desc}}
                               em.red-color {{data.inflow | ktCurrency}}
-                          td(:title="data.outflow | ktCurrency")
+                          td.minW(:title="data.outflow | ktCurrency")
                             span(v-if="data.outflow_desc") {{data.outflow_desc}}
                               em.green-color {{data.outflow | ktCurrency}}
-                          td(:title="data.net_cash_flow | ktFlow  | ktCurrency")
+                          td.minW(:title="data.net_cash_flow | ktFlow  | ktCurrency")
                             span {{data.net_cash_flow >= 0 ? '净流入' : '净流出'}}
                               em(:class="[data.net_cash_flow >= 0 ? 'red-color' : 'green-color']") {{data.net_cash_flow | ktFlow | ktCurrency }}
                           td
-                            span.bg-color {{data.execute_method}}
+                            span.bg-color(v-if="data.execute_method") {{data.execute_method}}
                           td.implement.status-column
                             i.icon-icomoon(:class="data.execute_status | excuteStatusIcon")
                             em.em-implement {{data.execute_status}}
@@ -524,6 +524,9 @@ export default {
       border-bottom: none;
     }
   }
+  .first_tdn{
+  width:220px!important;
+}
 }
 
 .overview-table {
@@ -595,4 +598,8 @@ export default {
     height: 350px;
   }
 }
+.minW{
+  width:150px;
+}
+
 </style>
