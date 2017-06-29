@@ -2,22 +2,23 @@
   .overview
     .today-overview
       h2 今日总览
-      .overview-left.fl
-        h3 当前存续金额（元）
-        .overview-left-middle
-          i(class="icon-icomoon icon-overview")
-          span {{balance.total | ktCurrency('')}}
-        .overview-left-down
-          .Principal.fl
-            span 存续本金
-              em {{balance.principal | ktCurrency('')}}
-          .Interest.fr
-            span 存续利息
-              em {{balance.interest | ktCurrency('')}}
-      .overview-right.fr
-        h3 今日存量产品占比分析
-        .overview-right-middle
-          kt-pie-echart(:chart-option="pieChartOption")
+      .overview-loading
+        .overview-left.fl
+          h3 当前存续金额（元）
+          .overview-left-middle
+            i(class="icon-icomoon icon-overview")
+            span {{balance.total | ktCurrency('')}}
+          .overview-left-down
+            .Principal.fl
+              span 存续本金
+                em {{balance.principal | ktCurrency('')}}
+            .Interest.fr
+              span 存续利息
+                em {{balance.interest | ktCurrency('')}}
+        .overview-right.fr
+          h3 今日存量产品占比分析
+          .overview-right-middle
+            kt-pie-echart(:chart-option="pieChartOption")
 
     .today-square
       h2 近期清算
@@ -338,21 +339,31 @@ export default {
 
   mounted() {
     this.instLoading = Loading.service({
-      target: '.overview'
+      target: '.overview-loading'
+    })
+    this.tableLoading = Loading.service({
+      target: '.today-square'
     })
 
     Promise.all([
       this.subsistGet(),
-      this.stockGet(),
-      this.liquidationGet(),
-      this.updatedProductsGet(),
-      this.stockTrendGet(),
-      this.capitalTrendGet()
+      this.stockGet()
     ]).then(() => {
       this.instLoading.close()
     }).catch(res => {
       this.instLoading.close()
     })
+
+    Promise.all([
+      this.liquidationGet(),
+      this.updatedProductsGet(),
+      this.stockTrendGet(),
+      this.capitalTrendGet()
+    ]).then(
+      this.tableLoading.close()
+      ).catch(
+      this.tableLoading.close()
+      )
   },
 
   data() {
@@ -403,6 +414,9 @@ export default {
 
 .today-overview {
   overflow: hidden;
+  .overview-loading{
+    overflow: hidden;
+  }
   .overview-left,
   .overview-right {
     border-radius: 4px;
