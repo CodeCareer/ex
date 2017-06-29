@@ -59,21 +59,21 @@ export default {
       },
       yAxis: {
         type: 'value',
-        name: '',
-        interval: 0,
-        axisLabel: {
-          show: true,
-          formatter: '{value}'
-        },
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: '#000'
-          }
-        },
-        axisTick: {
-          show: false
-        },
+        // name: '',
+        // interval: 0,
+        // axisLabel: {
+        //   show: true,
+        //   formatter: '{value}'
+        // },
+        // axisLine: {
+        //   show: true,
+        //   lineStyle: {
+        //     color: '#000'
+        //   }
+        // },
+        // axisTick: {
+        //   show: false
+        // },
         splitLine: {
           show: false
         }
@@ -83,8 +83,7 @@ export default {
         left: 100,
         right: 20,
         bottom: 60
-      },
-      series: []
+      }
     }
 
     this.echart.setOption(_.merge({}, option, this.chartOption))

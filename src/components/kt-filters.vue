@@ -120,6 +120,7 @@ function updateQuery() {
   _.each(_.flattenDeep(this.conditions), v => {
     query[v.key] = params[v.key] || (v.type === 'select' ? (v.options[0].value || v.options[0].name) : null)
   })
+  console.log(query)
   return query
 }
 </script>

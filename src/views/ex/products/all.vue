@@ -22,7 +22,7 @@
               span.icon-order-group
                 i.icon-icomoon.icon-arrow-top.asc
                 i.icon-icomoon.icon-arrow-top.desc
-            th.order-column(:class="[{active: query.sort_by === 'interest'}, query.order]", @click="sortBy('interest')")
+            th.order-column(:class="[{active: query.sort_by === 'value_at'}, query.order]", @click="sortBy('value_at')")
               | 起息日
               span.icon-order-group
                 i.icon-icomoon.icon-arrow-top.asc
@@ -107,7 +107,7 @@ export default {
         page: 1,
         per_page: 15
       }, routeQuery)
-
+      console.log(this.query)
       this.instLoading = Loading.service({
         target: '.products-all .table'
       })
