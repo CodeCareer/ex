@@ -120,8 +120,8 @@
                             i.icon-icomoon(:class="data.update_status | updateStatusIcon")
                             em.em-implement {{data.update_status}}
                           td
-                            span(v-show="data.execute_status === '待执行' ? true : false") 结算时限:
-                              em {{data.due_at}}
+                            span(v-show="data.update_status === '已更新' ? true : false") 更新时间:
+                              em {{data.updated_at}}
     .today-square
       h2 趋势图
       .trend-chart
